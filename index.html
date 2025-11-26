@@ -1,0 +1,778 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>대학 전공 MBTI 테스트</title>
+    <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css" />
+    <style>
+        /* [스타일 정의] 노션 스타일: 심플, 흑백, 깔끔함 */
+        :root {
+            --bg-color: #ffffff;
+            --text-color: #37352f;
+            --accent-color: #000000;
+            --gray-light: #f1f1ef;
+            --border-color: #e0e0e0;
+            --error-color: #eb5757;
+        }
+
+        body {
+            font-family: "Pretendard", -apple-system, BlinkMacSystemFont, system-ui, Roboto, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            min-height: 100vh;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 500px;
+            padding: 40px 20px;
+            text-align: center;
+        }
+
+        /* 공통 버튼 스타일 */
+        .btn {
+            display: block;
+            width: 100%;
+            padding: 16px;
+            margin-bottom: 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            background-color: white;
+            font-size: 16px;
+            cursor: pointer;
+            transition: 0.2s;
+            color: var(--text-color);
+        }
+
+        .btn:hover {
+            background-color: var(--gray-light);
+            border-color: var(--text-color);
+        }
+
+        .btn-primary {
+            background-color: var(--text-color);
+            color: white;
+            font-weight: bold;
+        }
+        .btn-primary:hover {
+            background-color: #555;
+            color: white;
+        }
+
+        .btn:disabled {
+            background-color: #ccc;
+            color: #888;
+            cursor: not-allowed;
+            border-color: #ccc;
+        }
+        .btn:disabled:hover {
+            background-color: #ccc;
+            border-color: #ccc;
+        }
+
+        /* 화면 전환 처리 */
+        .screen { display: none; }
+        .active { display: block; }
+
+        /* 시작 화면 */
+        .title { font-size: 32px; font-weight: 800; margin-bottom: 10px; }
+        .subtitle { font-size: 16px; color: #666; margin-bottom: 40px; }
+
+        /* 질문 화면 */
+        .progress-bar {
+            width: 100%;
+            height: 4px;
+            background-color: var(--gray-light);
+            margin-bottom: 30px;
+            border-radius: 2px;
+        }
+        .progress-fill {
+            height: 100%;
+            background-color: var(--accent-color);
+            width: 0%;
+            transition: width 0.3s;
+        }
+        .question-text {
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 40px;
+            line-height: 1.5;
+            word-break: keep-all;
+        }
+
+        /* 정보 입력 폼 화면 */
+        .form-title {
+            font-size: 24px;
+            font-weight: 800;
+            margin-bottom: 10px;
+        }
+        .form-subtitle {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 30px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+            text-align: left;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: var(--text-color);
+        }
+
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 14px 16px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 16px;
+            font-family: inherit;
+            box-sizing: border-box;
+            transition: border-color 0.2s;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: var(--text-color);
+        }
+
+        .form-group input.error,
+        .form-group select.error {
+            border-color: var(--error-color);
+        }
+
+        .error-message {
+            color: var(--error-color);
+            font-size: 12px;
+            margin-top: 6px;
+            display: none;
+        }
+
+        .error-message.show {
+            display: block;
+        }
+
+        /* 체크박스 스타일 */
+        .checkbox-group {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            margin-bottom: 20px;
+            text-align: left;
+        }
+
+        .checkbox-group input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            margin-top: 2px;
+            cursor: pointer;
+            accent-color: var(--text-color);
+        }
+
+        .checkbox-group label {
+            font-size: 14px;
+            line-height: 1.5;
+            cursor: pointer;
+            color: #555;
+        }
+
+        .checkbox-group label a {
+            color: var(--text-color);
+            text-decoration: underline;
+        }
+
+        .required {
+            color: var(--error-color);
+        }
+
+        /* 결과 화면 */
+        .result-code { font-size: 14px; font-weight: bold; color: #666; letter-spacing: 2px; margin-bottom: 8px; }
+        .result-title { font-size: 28px; font-weight: 800; margin-bottom: 10px; word-break: keep-all;}
+        .result-subtitle { font-size: 16px; margin-bottom: 30px; color: #555; }
+
+        .result-img-box {
+            width: 100%;
+            max-width: 300px;
+            height: 300px;
+            margin: 0 auto 30px;
+            background-color: var(--gray-light);
+            border-radius: 12px;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .result-img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+
+        .box {
+            background-color: var(--gray-light);
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            text-align: left;
+        }
+        .box h3 { margin-top: 0; font-size: 16px; margin-bottom: 10px; color: #888; text-transform: uppercase; font-size: 12px; font-weight: bold; }
+        .box p { margin: 0; font-size: 15px; line-height: 1.6; }
+
+        .highlight { font-weight: bold; color: #000; }
+
+        /* 블로그 링크 버튼 */
+        .btn-blog {
+            background-color: #03C75A;
+            color: white;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        .btn-blog:hover {
+            background-color: #02b351;
+            color: white;
+            border-color: #02b351;
+        }
+
+        /* 제출 중 로딩 */
+        .btn-loading {
+            position: relative;
+            color: transparent !important;
+        }
+        .btn-loading::after {
+            content: "";
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            top: 50%;
+            left: 50%;
+            margin-left: -10px;
+            margin-top: -10px;
+            border: 2px solid #ffffff;
+            border-top-color: transparent;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* 푸터 */
+        .footer {
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid var(--border-color);
+            font-size: 12px;
+            color: #888;
+        }
+
+    </style>
+</head>
+<body>
+
+<div class="container">
+
+    <!-- 시작 화면 -->
+    <div id="start-screen" class="screen active">
+        <h1 class="title">대학·전공<br>MBTI 테스트</h1>
+        <p class="subtitle">나의 성향으로 알아보는<br>찰떡궁합 학교와 학과는?</p>
+        <div style="font-size:50px; margin-bottom:40px;">🎓</div>
+        <button class="btn btn-primary" onclick="startTest()">테스트 시작하기</button>
+    </div>
+
+    <!-- 질문 화면 -->
+    <div id="question-screen" class="screen">
+        <div class="progress-bar">
+            <div class="progress-fill" id="progress"></div>
+        </div>
+        <div class="question-text" id="question">질문이 여기에 나옵니다</div>
+        <button class="btn" id="btn-a" onclick="selectOption('A')">옵션 A</button>
+        <button class="btn" id="btn-b" onclick="selectOption('B')">옵션 B</button>
+    </div>
+
+    <!-- 로딩 화면 -->
+    <div id="loading-screen" class="screen">
+        <h2 style="margin-top: 50%;">분석 중... 📝</h2>
+        <p>당신에게 맞는 입시 전략을<br>데이터베이스에서 찾고 있습니다.</p>
+    </div>
+
+    <!-- 정보 입력 폼 화면 -->
+    <div id="form-screen" class="screen">
+        <h2 class="form-title">거의 다 왔어요! 🎉</h2>
+        <p class="form-subtitle">결과를 확인하려면<br>아래 정보를 입력해주세요.</p>
+
+        <form id="user-form" onsubmit="submitForm(event)">
+            <div class="form-group">
+                <label for="userName">이름 <span class="required">*</span></label>
+                <input type="text" id="userName" name="userName" placeholder="이름을 입력해주세요" required>
+                <div class="error-message" id="userName-error">이름을 입력해주세요.</div>
+            </div>
+
+            <div class="form-group">
+                <label for="userPhone">핸드폰 번호 <span class="required">*</span></label>
+                <input type="tel" id="userPhone" name="userPhone" placeholder="010-0000-0000" required>
+                <div class="error-message" id="userPhone-error">올바른 핸드폰 번호를 입력해주세요.</div>
+            </div>
+
+            <div class="form-group">
+                <label for="userSchool">재학 학교 <span class="required">*</span></label>
+                <input type="text" id="userSchool" name="userSchool" placeholder="학교명을 입력해주세요" required>
+                <div class="error-message" id="userSchool-error">재학 학교를 입력해주세요.</div>
+            </div>
+
+            <div class="form-group">
+                <label for="userGrade">학년 <span class="required">*</span></label>
+                <select id="userGrade" name="userGrade" required>
+                    <option value="">학년을 선택해주세요</option>
+                    <option value="고1">고등학교 1학년</option>
+                    <option value="고2">고등학교 2학년</option>
+                    <option value="고3">고등학교 3학년</option>
+                    <option value="N수생">N수생</option>
+                    <option value="기타">기타</option>
+                </select>
+                <div class="error-message" id="userGrade-error">학년을 선택해주세요.</div>
+            </div>
+
+            <div class="checkbox-group">
+                <input type="checkbox" id="marketingAgree" name="marketingAgree" required>
+                <label for="marketingAgree">
+                    <span class="required">[필수]</span> 마케팅 정보 수신에 동의합니다.<br>
+                    <small style="color:#888;">입시 정보, 이벤트, 맞춤 콘텐츠 등을 받아보실 수 있습니다.</small>
+                </label>
+            </div>
+            <div class="error-message" id="marketingAgree-error" style="margin-top: -10px; margin-bottom: 20px;">마케팅 동의에 체크해주세요.</div>
+
+            <button type="submit" class="btn btn-primary" id="submit-btn">결과 확인하기</button>
+        </form>
+    </div>
+
+    <!-- 결과 화면 -->
+    <div id="result-screen" class="screen">
+        <div class="result-code" id="result-code">CODE</div>
+        <h1 class="result-title" id="result-title">타입 이름</h1>
+        <p class="result-subtitle" id="result-subtitle">한 줄 요약</p>
+
+        <div class="result-img-box">
+            <img id="result-img" class="result-img" src="" alt="결과 이미지" onerror="this.style.display='none';">
+            <span id="img-placeholder" style="color:#999; font-size:14px;">(이미지 파일 필요)</span>
+        </div>
+
+        <div class="box">
+            <h3>어떤 학생이냐면</h3>
+            <p id="result-desc">설명</p>
+        </div>
+
+        <div class="box" style="background-color: #e3f2fd;">
+            <h3 style="color: #1565c0;">✨ 추천 학교 & 전공</h3>
+            <p id="result-major" class="highlight">전공</p>
+        </div>
+
+        <div class="box">
+            <h3>💡 공부 전략</h3>
+            <p id="result-tip">팁</p>
+        </div>
+
+        <button class="btn btn-primary" onclick="location.reload()">테스트 다시하기</button>
+
+        <a href="https://blog.naver.com/jinhak-high" target="_blank" class="btn btn-blog">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M16.273 12.845L7.376 0H0v24h7.727V11.155L16.624 24H24V0h-7.727v12.845z"/>
+            </svg>
+            진학하이 블로그 방문하기
+        </a>
+
+        <div class="footer">
+            더 자세한 입시 상담이 필요하시면<br>
+            진학하이에서 무료 상담을 받아보세요!
+        </div>
+    </div>
+
+</div>
+
+<script>
+    // Google Apps Script 웹 앱 URL
+    const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycby-x1OUT45LRCrkmxxRBOcsMbS0w0q8kO9UlFcGtjlP6D4YrA7ksGVRQ0wlNLlMcJE/exec';
+
+    // [데이터 정의] 질문 20개
+    const questions = [
+        // I/E
+        { q: "시험 기간, 나에게 더 잘 맞는 공부 장소는?", a: "칸막이 쳐진 독서실 (혼자)", b: "탁 트인 카페 (사람 온기 필요)", type: "EI" },
+        { q: "조별 과제 팀원을 모아야 할 때 나는?", a: "친구가 말 걸어주길 기다린다", b: "내가 먼저 애들을 포섭한다", type: "EI" },
+        { q: "수업 중 어려운 질문을 받았다면?", a: "속으로 답을 생각한다", b: "손들고 발표하거나 짝꿍과 말한다", type: "EI" },
+        { q: "주말에 하루 종일 집에 혼자 있다면?", a: "완전 힐링, 에너지 충전!", b: "심심해서 친구에게 연락한다", type: "EI" },
+        { q: "고민이 생겼을 때 나는?", a: "혼자 곰곰이 생각하며 정리", b: "친구들에게 털어놔야 풀림", type: "EI" },
+        // M/L
+        { q: "더 흥미롭고 점수가 잘 나오는 과목은?", a: "수학, 과학 (답이 딱 떨어짐)", b: "국어, 사회 (맥락과 해석)", type: "ML" },
+        { q: "뉴스에서 'AI 기술' 기사가 나왔다.", a: "어떤 원리로 작동하지? (기술)", b: "우리 일자리를 뺏을까? (영향)", type: "ML" },
+        { q: "선호하는 수행평가 유형은?", a: "통계/그래프 분석 보고서", b: "에세이 쓰기나 말하기 발표", type: "ML" },
+        { q: "친구가 '배 아파'라고 할 때 생각은?", a: "뭘 잘못 먹었지? (원인 분석)", b: "헐 진짜? 많이 아파? (공감)", type: "ML" },
+        { q: "서점에서 발길이 가는 코너는?", a: "과학, IT, 경제(숫자)", b: "소설, 에세이, 심리", type: "ML" },
+        // S/P
+        { q: "대학 입시 전략을 짤 때 나는?", a: "안전하게! 합격 가능한 곳 위주", b: "인생은 한 방! 상향 지원 도전", type: "SP" },
+        { q: "문제집을 풀 때 나는?", a: "1번부터 순서대로 푼다", b: "풀고 싶은 것부터 골라 푼다", type: "SP" },
+        { q: "새로운 동아리를 선택한다면?", a: "체계 잡힌 전통 있는 동아리", b: "내가 주도하는 신생 동아리", type: "SP" },
+        { q: "여행 계획을 짤 때 나는?", a: "분 단위로 엑셀 정리", b: "대충 큰 틀만 잡고 출발", type: "SP" },
+        { q: "자유 주제 발표 시간이라면?", a: "가이드라인 예시를 찾는다", b: "평소 관심 있던 독특한 주제!", type: "SP" },
+        // T/F
+        { q: "공부할 때 더 중요한 것은?", a: "정의와 원리 이해 (Why)", b: "어디에 써먹는지 (How)", type: "TF" },
+        { q: "진로 선택의 기준은?", a: "학문적 깊이, 나의 호기심", b: "취업률, 연봉, 실용성", type: "TF" },
+        { q: "멘토링 강연, 누구를 부를까?", a: "노벨상 수상자/교수님", b: "성공한 창업가/현직자", type: "TF" },
+        { q: "물건 살 때 더 중요한 건?", a: "객관적인 스펙 데이터", b: "실제 사용 후기/리뷰", type: "TF" },
+        { q: "대학 가서 더 하고 싶은 건?", a: "도서관에서 전공 공부 A+", b: "인턴, 창업, 공모전 스펙", type: "TF" }
+    ];
+
+    // [데이터 정의] 결과값
+    const resultData = {
+        "IMST": {
+            title: "빈틈없는 논리 설계자",
+            subtitle: "감보다는 데이터, 모험보다는 확실한 정석!",
+            desc: "혼자 깊게 파고드는 걸 좋아하고, 숫자로 딱 떨어지는 결과에 안정을 느껴요. 검증된 길을 걷는 것을 선호하며, 원리를 완벽하게 이해해야 직성이 풀리는 학구파입니다.",
+            major: "서울대·고려대 통계학과, 시립대 세무학과",
+            tip: "개념서를 바이블처럼! '오답 노트'로 구멍을 메우는 완벽주의 공부법이 통합니다."
+        },
+        "IMSF": {
+            title: "실속 챙기는 테크니션",
+            subtitle: "이론은 짧게, 실전은 길게! 기술로 승부한다.",
+            desc: "복잡한 이론보다는 당장 내 손으로 구현하고 결과가 나오는 걸 좋아해요. 기술, 코딩, 엔지니어링처럼 확실한 '기술'을 무기로 삼는 실리적인 타입입니다.",
+            major: "성균관대 반도체시스템공학, 한양대 소프트웨어학부",
+            tip: "백문이 불여일타! 강의만 듣지 말고 직접 문제를 풀거나 코드를 짜며 손으로 익히세요."
+        },
+        "IMPT": {
+            title: "호기심 천국 탐구자",
+            subtitle: "남들이 안 가는 길에서 답을 찾는 천재성.",
+            desc: "정해진 커리큘럼은 답답해해요. 내가 꽂힌 분야(우주, AI, 신소재 등)는 밤을 새워서라도 파고듭니다. 남들이 어려워하는 난제에 도전하는 걸 즐깁니다.",
+            major: "서울대 물리·천문학부, 이화여대 뇌인지과학부",
+            tip: "자유도가 높은 '탐구 보고서'나 '심화 학습' 위주로 생기부를 채우면 대박 날 스타일."
+        },
+        "IMPF": {
+            title: "방구석 혁신가",
+            subtitle: "조용히 세상을 바꿀 기술을 만드는 메이커.",
+            desc: "사람 만나는 것보다 기계나 코드랑 노는 게 더 편해요. 새로운 기술, 앱, 발명품을 직접 만들어보고 창업이나 프로젝트로 실현해보고 싶은 욕구가 강합니다.",
+            major: "한양대 미래자동차공학과, 서강대 아트&테크놀로지",
+            tip: "프로젝트형 공부가 딱! 친구들과 경쟁하기보다 나만의 포트폴리오를 만드는 데 집중하세요."
+        },
+        "ILST": {
+            title: "대쪽 같은 선비",
+            subtitle: "한 문장을 읽어도 깊게, 본질을 꿰뚫는 힘.",
+            desc: "가볍게 떠드는 것보다 혼자 책 읽고 사색하는 시간이 소중해요. 역사, 철학, 문학처럼 인간의 본질을 탐구하거나 법/행정처럼 체계적인 학문을 선호합니다.",
+            major: "서울대 경제학부, 고려대 사학과/철학과",
+            tip: "단권화의 신! 교과서와 연계 도서를 엮어서 깊이 있게 정리하는 공부가 맞아요."
+        },
+        "ILSF": {
+            title: "다정한 서포터",
+            subtitle: "세심한 배려로 사람을 치유하고 돕는 전문가.",
+            desc: "나서기보다는 뒤에서 묵묵히 챙겨주는 스타일이에요. 사람의 마음을 이해하거나 실질적인 도움을 주는 복지, 의료, 교육 분야에서 빛을 발합니다.",
+            major: "이화여대 간호학부, 중앙대 심리학과",
+            tip: "스터디 그룹에서 '설명해주기' 역할을 맡아보세요. 남을 도우며 내 공부도 완성됩니다."
+        },
+        "ILPT": {
+            title: "날카로운 비평가",
+            subtitle: "세상의 이면을 읽어내는 통찰력.",
+            desc: "당연한 것에 '왜?'라는 질문을 던집니다. 사회 문제, 정책, 국제 정세 등을 분석하고 비판적인 시각으로 글을 쓰거나 토론하는 능력이 탁월합니다.",
+            major: "한국외대 LD/LT학부, 연세대 정치외교학과",
+            tip: "뉴스, 칼럼 등을 스크랩하며 나만의 관점을 정리하는 '논술형 공부'가 강점입니다."
+        },
+        "ILPF": {
+            title: "감성 타고난 작가",
+            subtitle: "나만의 세계관을 글과 예술로 표현하는 창작자.",
+            desc: "상상력이 풍부하고 감수성이 예민해요. 정해진 틀보다는 자유로운 분위기에서 글을 쓰거나 콘텐츠를 기획할 때 에너지가 폭발합니다.",
+            major: "연세대 언론홍보영상학부, 중앙대 문예창작과",
+            tip: "딱딱한 암기보다는 '스토리텔링'으로 외우세요. 역사를 드라마처럼 이해하면 만점!"
+        },
+        "EMST": {
+            title: "현실적인 전략가",
+            subtitle: "최소 시간 최대 효율, 스마트한 승부사.",
+            desc: "감정적인 호소보다는 정확한 수치와 근거를 믿습니다. 조직 내에서 체계를 잡고, 자원을 관리하고, 돈의 흐름을 읽는 능력이 뛰어납니다.",
+            major: "고려대 경영대학, 연세대 응용통계학과",
+            tip: "타이머를 활용하세요! 제한 시간 안에 문제를 풀어내는 타임 어택 연습이 효과적입니다."
+        },
+        "EMSF": {
+            title: "유능한 해결사",
+            subtitle: "문제가 생기면 답을 찾아내는 현장 지휘관.",
+            desc: "책상 앞 공부보다 현장에서 부딪히며 배우는 걸 선호합니다. 공학적 지식과 리더십을 겸비해 프로젝트를 성공으로 이끄는 리더 타입입니다.",
+            major: "서울대 산업공학과, 한양대 정보시스템학과",
+            tip: "플래너 활용의 달인. 주간 계획을 세우고 하나씩 지워나가는 성취감을 즐기세요."
+        },
+        "EMPT": {
+            title: "야망 있는 개척자",
+            subtitle: "큰 그림을 그리고 판을 짜는 미래의 CEO.",
+            desc: "안정적인 직장보다는 내 사업이나 큰 프로젝트를 꿈꿉니다. 데이터와 트렌드를 읽어 과감하게 투자하거나 새로운 시장을 개척하는 배짱이 있습니다.",
+            major: "성균관대 글로벌경영학과, 고려대 경영학과",
+            tip: "경쟁이 약입니다. 라이벌을 설정하거나 모의고사 등수를 목표로 삼으면 불타오릅니다."
+        },
+        "EMPF": {
+            title: "슈퍼 제너럴리스트",
+            subtitle: "이과 머리와 문과 감성을 다 가진 융합형 인재.",
+            desc: "호기심이 많아 이것저것 다 잘합니다. 기술도 알지만 사람도 잘 다뤄서, 개발자와 디자이너 사이를 조율하거나 기술 창업을 하기에 최적화되어 있습니다.",
+            major: "연세대 언더우드국제대학(UIC), 서강대 아트&테크놀로지",
+            tip: "여러 과목을 짧게 끊어서 공부하세요. 지루할 틈을 주지 않는 '순환 학습' 추천!"
+        },
+        "ELST": {
+            title: "모범적인 리더",
+            subtitle: "규칙과 원칙을 지키며 모두를 이끄는 반장 스타일.",
+            desc: "책임감이 강하고 공적인 가치를 중요하게 생각합니다. 법, 규범, 교육 시스템 안에서 사람들을 올바른 방향으로 이끄는 역할이 잘 어울립니다.",
+            major: "고려대 교육학과, 시립대 도시행정학과",
+            tip: "가르치면서 공부하기! 친구들에게 선생님처럼 설명해주면 내가 제일 공부가 잘됩니다."
+        },
+        "ELSF": {
+            title: "분위기 메이커",
+            subtitle: "사람이 재산! 어디서나 환영받는 인싸력.",
+            desc: "사람들과 어울리며 에너지를 얻습니다. 서비스 마인드가 투철하고, 트렌드에 민감해 대중이 뭘 좋아하는지 본능적으로 캐치합니다.",
+            major: "경희대 호텔경영학과, 중앙대 광고홍보학과",
+            tip: "혼자 독서실 절대 금지. 스터디 그룹이나 개방형 도서관에서 '함께' 공부해야 능률 업!"
+        },
+        "ELPT": {
+            title: "글로벌 외교관",
+            subtitle: "무대는 세계로! 언변과 논리로 설득하는 협상가.",
+            desc: "국내에만 머물기엔 그릇이 큽니다. 외국어에 능통하거나 국제 정세, 이슈에 관심이 많아 세계를 누비며 활약하는 꿈을 꿉니다.",
+            major: "한국외대 LD/LT학부, 연세대 국제학부(HASS)",
+            tip: "영어 원서 읽기나 미드 쉐도잉 등 언어와 공부를 결합하면 시너지가 납니다."
+        },
+        "ELPF": {
+            title: "트렌드 세터",
+            subtitle: "지루한 건 딱 질색, 세상의 중심에서 나를 외치다.",
+            desc: "끼가 넘치고 표현력이 좋습니다. 영상, 미디어, 방송 등 내가 주인공이 되거나 내 창작물을 대중에게 보여주는 일에서 희열을 느낍니다.",
+            major: "연세대 언론홍보영상학부, 이화여대 스크랜튼학부",
+            tip: "유튜브나 인스타로 배운 내용을 요약해서 올리는 등 '아웃풋' 위주의 공부가 재밌을 거예요."
+        }
+    };
+
+    // [로직] 변수 설정
+    let currentQuestion = 0;
+    let scores = { I:0, E:0, M:0, L:0, S:0, P:0, T:0, F:0 };
+    let resultCode = "";
+
+    function startTest() {
+        document.getElementById('start-screen').classList.remove('active');
+        document.getElementById('question-screen').classList.add('active');
+        showQuestion();
+    }
+
+    function showQuestion() {
+        const q = questions[currentQuestion];
+        document.getElementById('question').innerText = `Q${currentQuestion+1}. ${q.q}`;
+        document.getElementById('btn-a').innerText = q.a;
+        document.getElementById('btn-b').innerText = q.b;
+
+        // 진행바 업데이트
+        const progressPercent = ((currentQuestion) / questions.length) * 100;
+        document.getElementById('progress').style.width = `${progressPercent}%`;
+    }
+
+    function selectOption(choice) {
+        const q = questions[currentQuestion];
+        const type = q.type;
+
+        // 점수 매핑
+        if (choice === 'B') {
+            if(type === 'EI') scores.E++;
+            if(type === 'ML') scores.L++;
+            if(type === 'SP') scores.P++;
+            if(type === 'TF') scores.F++;
+        } else {
+            if(type === 'EI') scores.I++;
+            if(type === 'ML') scores.M++;
+            if(type === 'SP') scores.S++;
+            if(type === 'TF') scores.T++;
+        }
+
+        currentQuestion++;
+        if (currentQuestion < questions.length) {
+            showQuestion();
+        } else {
+            showLoading();
+        }
+    }
+
+    function showLoading() {
+        document.getElementById('question-screen').classList.remove('active');
+        document.getElementById('loading-screen').classList.add('active');
+
+        // 결과 코드 미리 계산
+        resultCode = "";
+        resultCode += scores.E > scores.I ? "E" : "I";
+        resultCode += scores.L > scores.M ? "L" : "M";
+        resultCode += scores.P > scores.S ? "P" : "S";
+        resultCode += scores.F > scores.T ? "F" : "T";
+
+        setTimeout(() => {
+            showForm();
+        }, 1500);
+    }
+
+    function showForm() {
+        document.getElementById('loading-screen').classList.remove('active');
+        document.getElementById('form-screen').classList.add('active');
+    }
+
+    // 폼 유효성 검사 및 제출
+    function submitForm(event) {
+        event.preventDefault();
+
+        let isValid = true;
+
+        // 이름 검사
+        const userName = document.getElementById('userName');
+        if (!userName.value.trim()) {
+            userName.classList.add('error');
+            document.getElementById('userName-error').classList.add('show');
+            isValid = false;
+        } else {
+            userName.classList.remove('error');
+            document.getElementById('userName-error').classList.remove('show');
+        }
+
+        // 핸드폰 번호 검사
+        const userPhone = document.getElementById('userPhone');
+        const phoneRegex = /^01[0-9]-?[0-9]{3,4}-?[0-9]{4}$/;
+        if (!userPhone.value.trim() || !phoneRegex.test(userPhone.value.replace(/-/g, '').replace(/^01/, '01'))) {
+            // 좀 더 유연한 검사
+            const cleanPhone = userPhone.value.replace(/-/g, '');
+            if (!/^01[0-9]{8,9}$/.test(cleanPhone)) {
+                userPhone.classList.add('error');
+                document.getElementById('userPhone-error').classList.add('show');
+                isValid = false;
+            } else {
+                userPhone.classList.remove('error');
+                document.getElementById('userPhone-error').classList.remove('show');
+            }
+        } else {
+            userPhone.classList.remove('error');
+            document.getElementById('userPhone-error').classList.remove('show');
+        }
+
+        // 재학 학교 검사
+        const userSchool = document.getElementById('userSchool');
+        if (!userSchool.value.trim()) {
+            userSchool.classList.add('error');
+            document.getElementById('userSchool-error').classList.add('show');
+            isValid = false;
+        } else {
+            userSchool.classList.remove('error');
+            document.getElementById('userSchool-error').classList.remove('show');
+        }
+
+        // 학년 검사
+        const userGrade = document.getElementById('userGrade');
+        if (!userGrade.value) {
+            userGrade.classList.add('error');
+            document.getElementById('userGrade-error').classList.add('show');
+            isValid = false;
+        } else {
+            userGrade.classList.remove('error');
+            document.getElementById('userGrade-error').classList.remove('show');
+        }
+
+        // 마케팅 동의 검사
+        const marketingAgree = document.getElementById('marketingAgree');
+        if (!marketingAgree.checked) {
+            document.getElementById('marketingAgree-error').classList.add('show');
+            isValid = false;
+        } else {
+            document.getElementById('marketingAgree-error').classList.remove('show');
+        }
+
+        if (isValid) {
+            // 버튼 로딩 상태
+            const submitBtn = document.getElementById('submit-btn');
+            submitBtn.classList.add('btn-loading');
+            submitBtn.disabled = true;
+
+            const data = resultData[resultCode];
+
+            // 전송할 데이터
+            const userData = {
+                name: userName.value,
+                phone: userPhone.value,
+                school: userSchool.value,
+                grade: userGrade.value,
+                resultCode: resultCode,
+                resultTitle: data.title,
+                resultMajor: data.major
+            };
+
+            // Google Sheets로 데이터 전송
+            if (GOOGLE_SCRIPT_URL !== 'YOUR_GOOGLE_SCRIPT_URL_HERE') {
+                fetch(GOOGLE_SCRIPT_URL, {
+                    method: 'POST',
+                    mode: 'no-cors',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(userData)
+                })
+                .then(() => {
+                    console.log('데이터 전송 완료');
+                    showResult();
+                })
+                .catch(error => {
+                    console.error('전송 오류:', error);
+                    // 오류가 나도 결과는 보여줌
+                    showResult();
+                });
+            } else {
+                // URL이 설정되지 않은 경우 콘솔에만 출력
+                console.log('⚠️ Google Script URL이 설정되지 않았습니다.');
+                console.log('수집된 데이터:', userData);
+                showResult();
+            }
+        }
+    }
+
+    function showResult() {
+        document.getElementById('form-screen').classList.remove('active');
+        document.getElementById('result-screen').classList.add('active');
+
+        const data = resultData[resultCode];
+
+        // 화면에 뿌리기
+        document.getElementById('result-code').innerText = resultCode;
+        document.getElementById('result-title').innerText = data.title;
+        document.getElementById('result-subtitle').innerText = data.subtitle;
+        document.getElementById('result-desc').innerText = data.desc;
+        document.getElementById('result-major').innerText = data.major;
+        document.getElementById('result-tip').innerText = data.tip;
+
+        // 이미지 연결
+        const imgPath = `images/${resultCode}.png`;
+        const imgTag = document.getElementById('result-img');
+        imgTag.src = imgPath;
+
+        imgTag.onload = function() {
+            document.getElementById('img-placeholder').style.display = 'none';
+        }
+    }
+
+    // 실시간 입력 검사 (에러 스타일 제거)
+    document.addEventListener('DOMContentLoaded', function() {
+        const inputs = document.querySelectorAll('#user-form input, #user-form select');
+        inputs.forEach(input => {
+            input.addEventListener('input', function() {
+                this.classList.remove('error');
+                const errorEl = document.getElementById(this.id + '-error');
+                if (errorEl) errorEl.classList.remove('show');
+            });
+            input.addEventListener('change', function() {
+                this.classList.remove('error');
+                const errorEl = document.getElementById(this.id + '-error');
+                if (errorEl) errorEl.classList.remove('show');
+            });
+        });
+    });
+</script>
+
+</body>
+</html>
