@@ -14,6 +14,7 @@
             --border-color: #e0e0e0;
             --blue-light: #e3f2fd;
             --blue-text: #1565c0;
+            --error-color: #eb5757;
         }
 
         body {
@@ -123,6 +124,150 @@
             margin-bottom: 4px;
         }
 
+        /* 블러 프리뷰 스타일 */
+        .blur-preview-container {
+            position: relative;
+        }
+        .blur-content {
+            filter: blur(8px);
+            user-select: none;
+            pointer-events: none;
+        }
+        .blur-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: rgba(255,255,255,0.7);
+            border-radius: 16px;
+            z-index: 10;
+        }
+        .blur-overlay-icon {
+            font-size: 48px;
+            margin-bottom: 16px;
+        }
+        .blur-overlay-text {
+            font-size: 18px;
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 8px;
+        }
+        .blur-overlay-subtext {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 20px;
+        }
+
+        /* 폼 스타일 */
+        .form-container {
+            background-color: var(--gray-light);
+            padding: 24px;
+            border-radius: 16px;
+            margin-bottom: 20px;
+            text-align: left;
+        }
+        .form-title {
+            font-size: 20px;
+            font-weight: 800;
+            margin-bottom: 8px;
+            text-align: center;
+        }
+        .form-subtitle {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        .form-group {
+            margin-bottom: 16px;
+        }
+        .form-group label {
+            display: block;
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 6px;
+            color: var(--text-color);
+        }
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 14px 16px;
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            font-size: 16px;
+            font-family: inherit;
+            box-sizing: border-box;
+            transition: border-color 0.2s;
+        }
+        .form-group input:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: var(--text-color);
+        }
+        .form-group input.error,
+        .form-group select.error {
+            border-color: var(--error-color);
+        }
+        .error-message {
+            color: var(--error-color);
+            font-size: 12px;
+            margin-top: 4px;
+            display: none;
+        }
+        .error-message.show {
+            display: block;
+        }
+        .required {
+            color: var(--error-color);
+        }
+        .checkbox-group {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            margin-bottom: 16px;
+        }
+        .checkbox-group input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            margin-top: 2px;
+            cursor: pointer;
+            accent-color: var(--text-color);
+        }
+        .checkbox-group label {
+            font-size: 14px;
+            line-height: 1.5;
+            cursor: pointer;
+            color: #555;
+        }
+
+        /* 버튼 로딩 */
+        .btn-loading {
+            position: relative;
+            color: transparent !important;
+        }
+        .btn-loading::after {
+            content: "";
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            top: 50%;
+            left: 50%;
+            margin-left: -10px;
+            margin-top: -10px;
+            border: 2px solid #ffffff;
+            border-top-color: transparent;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
     </style>
 </head>
 <body>
@@ -153,6 +298,99 @@
         </div>
     </div>
 
+    <!-- 블러 프리뷰 + 폼 화면 -->
+    <div id="preview-screen" class="screen">
+        <div class="result-code" id="preview-code">CODE</div>
+        <h1 class="result-title" id="preview-title">타입</h1>
+        <p class="result-subtitle" id="preview-subtitle">부제</p>
+
+        <div class="result-img-box">
+            <img id="preview-img" class="result-img" src="" alt="결과 이미지" onerror="this.style.display='none';">
+            <span id="preview-img-placeholder" style="color:#aaa; font-size:13px;">(이미지 로딩 중...)</span>
+        </div>
+
+        <!-- 블러 처리된 상세 내용 -->
+        <div class="blur-preview-container">
+            <div class="blur-content">
+                <div class="box">
+                    <h3>🧐 대학이 보는 당신은?</h3>
+                    <p>당신의 성향을 분석한 결과, 대학에서는 당신을 특별한 인재로 평가합니다. 자세한 내용은 정보 입력 후 확인하세요.</p>
+                </div>
+
+                <div class="box highlight-box">
+                    <h3>🎓 최적의 학과 & 대학</h3>
+                    <p class="highlight-text">서울대, 연세대, 고려대 등 주요 대학의 맞춤 학과</p>
+                    <p style="font-size:13px; margin-top:10px; color:#5c6bc0;">* 계약학과 및 특성화학과 포함</p>
+                </div>
+
+                <div class="box">
+                    <h3>📝 입시 & 공부 필승 전략</h3>
+                    <ul>
+                        <li>당신만을 위한 맞춤 공부법</li>
+                        <li>수시 전략 및 생기부 관리 팁</li>
+                        <li>정시 대비 핵심 포인트</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="blur-overlay">
+                <div class="blur-overlay-icon">🔒</div>
+                <div class="blur-overlay-text">상세 결과 보기</div>
+                <div class="blur-overlay-subtext">아래 정보를 입력하면 전체 결과를 확인할 수 있어요!</div>
+            </div>
+        </div>
+
+        <!-- 정보 입력 폼 -->
+        <div class="form-container">
+            <h3 class="form-title">거의 다 왔어요! 🎉</h3>
+            <p class="form-subtitle">정보를 입력하고 나만의 입시 전략을 확인하세요.</p>
+
+            <form id="user-form" onsubmit="submitForm(event)">
+                <div class="form-group">
+                    <label for="userName">이름 <span class="required">*</span></label>
+                    <input type="text" id="userName" name="userName" placeholder="이름을 입력해주세요" required>
+                    <div class="error-message" id="userName-error">이름을 입력해주세요.</div>
+                </div>
+
+                <div class="form-group">
+                    <label for="userPhone">핸드폰 번호 <span class="required">*</span></label>
+                    <input type="tel" id="userPhone" name="userPhone" placeholder="010-0000-0000" required>
+                    <div class="error-message" id="userPhone-error">올바른 핸드폰 번호를 입력해주세요.</div>
+                </div>
+
+                <div class="form-group">
+                    <label for="userSchool">재학 학교 <span class="required">*</span></label>
+                    <input type="text" id="userSchool" name="userSchool" placeholder="학교명을 입력해주세요" required>
+                    <div class="error-message" id="userSchool-error">재학 학교를 입력해주세요.</div>
+                </div>
+
+                <div class="form-group">
+                    <label for="userGrade">학년 <span class="required">*</span></label>
+                    <select id="userGrade" name="userGrade" required>
+                        <option value="">학년을 선택해주세요</option>
+                        <option value="고1">고등학교 1학년</option>
+                        <option value="고2">고등학교 2학년</option>
+                        <option value="고3">고등학교 3학년</option>
+                        <option value="N수생">N수생</option>
+                        <option value="기타">기타</option>
+                    </select>
+                    <div class="error-message" id="userGrade-error">학년을 선택해주세요.</div>
+                </div>
+
+                <div class="checkbox-group">
+                    <input type="checkbox" id="marketingAgree" name="marketingAgree" required>
+                    <label for="marketingAgree">
+                        <span class="required">[필수]</span> 마케팅 정보 수신에 동의합니다.<br>
+                        <small style="color:#888;">입시 정보, 이벤트, 맞춤 콘텐츠 등을 받아보실 수 있습니다.</small>
+                    </label>
+                </div>
+                <div class="error-message" id="marketingAgree-error" style="margin-top: -10px; margin-bottom: 16px;">마케팅 동의에 체크해주세요.</div>
+
+                <button type="submit" class="btn btn-primary" id="submit-btn">전체 결과 확인하기</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- 최종 결과 화면 -->
     <div id="result-screen" class="screen">
         <div class="result-code" id="result-code">CODE</div>
         <h1 class="result-title" id="result-title">타입</h1>
@@ -186,7 +424,10 @@
 </div>
 
 <script>
-    // [질문 데이터 20개 - 이전과 동일]
+    // Google Apps Script 웹 앱 URL (필요시 설정)
+    const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycby-x1OUT45LRCrkmxxRBOcsMbS0w0q8kO9UlFcGtjlP6D4YrA7ksGVRQ0wlNLlMcJE/exec';
+
+    // [질문 데이터 20개]
     const questions = [
         // I/E
         { q: "시험 기간, 나에게 더 잘 맞는 공부 장소는?", a: "칸막이 쳐진 독서실 (혼자 집중)", b: "탁 트인 카페 (약간의 소음)", type: "EI" },
@@ -214,9 +455,8 @@
         { q: "대학 가서 더 하고 싶은 건?", a: "도서관에서 전공 서적 파기", b: "인턴, 창업, 공모전 경험", type: "TF" }
     ];
 
-    // [결과 데이터] 심화 버전 (인재상, 공부법, 입시전략 상세화)
+    // [결과 데이터] 심화 버전
     const resultData = {
-        // 1. 분석가형 (I + M)
         "IMST": {
             title: "빈틈없는 논리 설계자",
             subtitle: "감보다는 데이터, 모험보다는 정석!",
@@ -261,8 +501,6 @@
                 "<b>🎯 정시 팁:</b> 벼락치기에 능하지만 수능은 장기전입니다. 플래너를 쓰기보다 '매일 할 분량'만 딱 정해놓고 그것만 끝내는 식으로 가볍게 시작하세요."
             ]
         },
-
-        // 2. 인문학자형 (I + L)
         "ILST": {
             title: "대쪽 같은 선비",
             subtitle: "한 문장을 읽어도 깊게, 본질을 꿰뚫는 힘.",
@@ -307,8 +545,6 @@
                 "<b>🎯 정시 팁:</b> 기분파 기질을 조심하세요. 감정이 우울하면 공부를 놓아버릴 수 있습니다. 규칙적인 생활 리듬을 유지하는 게 관건입니다."
             ]
         },
-
-        // 3. 리더형 (E + M)
         "EMST": {
             title: "현실적인 전략가",
             subtitle: "최소 시간 최대 효율, 스마트한 승부사.",
@@ -353,8 +589,6 @@
                 "<b>🎯 정시 팁:</b> 국영수탐 골고루 잘하는 올라운더입니다. 특정 과목 망치지 않게 밸런스 유지만 잘하면 정시로도 승산이 큽니다."
             ]
         },
-
-        // 4. 활동가형 (E + L)
         "ELST": {
             title: "모범적인 리더",
             subtitle: "규칙과 원칙을 지키며 모두를 이끄는 반장.",
@@ -401,9 +635,10 @@
         }
     };
 
-    // [로직] 변수 및 함수 (이전과 동일, 렌더링 부분만 수정됨)
+    // [로직] 변수
     let currentQuestion = 0;
     let scores = { I:0, E:0, M:0, L:0, S:0, P:0, T:0, F:0 };
+    let resultCode = "";
 
     function startTest() {
         document.getElementById('start-screen').classList.remove('active');
@@ -445,47 +680,190 @@
     function showLoading() {
         document.getElementById('question-screen').classList.remove('active');
         document.getElementById('loading-screen').classList.add('active');
+
+        // 결과 코드 미리 계산
+        resultCode = "";
+        resultCode += scores.E > scores.I ? "E" : "I";
+        resultCode += scores.L > scores.M ? "L" : "M";
+        resultCode += scores.P > scores.S ? "P" : "S";
+        resultCode += scores.F > scores.T ? "F" : "T";
+
         setTimeout(() => {
-            showResult();
+            showPreview();
         }, 1800);
     }
 
-    function showResult() {
+    function showPreview() {
         document.getElementById('loading-screen').classList.remove('active');
+        document.getElementById('preview-screen').classList.add('active');
+
+        const data = resultData[resultCode];
+
+        // 프리뷰에 기본 정보만 표시 (블러 처리되지 않은 부분)
+        document.getElementById('preview-code').innerText = resultCode;
+        document.getElementById('preview-title').innerText = data.title;
+        document.getElementById('preview-subtitle').innerText = data.subtitle;
+
+        // 이미지 연결
+        const imgPath = `images/${resultCode}.png`;
+        const imgTag = document.getElementById('preview-img');
+        imgTag.src = imgPath;
+        imgTag.onload = function() {
+            document.getElementById('preview-img-placeholder').style.display = 'none';
+        }
+    }
+
+    // 폼 제출
+    function submitForm(event) {
+        event.preventDefault();
+
+        let isValid = true;
+
+        // 이름 검사
+        const userName = document.getElementById('userName');
+        if (!userName.value.trim()) {
+            userName.classList.add('error');
+            document.getElementById('userName-error').classList.add('show');
+            isValid = false;
+        } else {
+            userName.classList.remove('error');
+            document.getElementById('userName-error').classList.remove('show');
+        }
+
+        // 핸드폰 번호 검사
+        const userPhone = document.getElementById('userPhone');
+        const cleanPhone = userPhone.value.replace(/-/g, '');
+        if (!/^01[0-9]{8,9}$/.test(cleanPhone)) {
+            userPhone.classList.add('error');
+            document.getElementById('userPhone-error').classList.add('show');
+            isValid = false;
+        } else {
+            userPhone.classList.remove('error');
+            document.getElementById('userPhone-error').classList.remove('show');
+        }
+
+        // 재학 학교 검사
+        const userSchool = document.getElementById('userSchool');
+        if (!userSchool.value.trim()) {
+            userSchool.classList.add('error');
+            document.getElementById('userSchool-error').classList.add('show');
+            isValid = false;
+        } else {
+            userSchool.classList.remove('error');
+            document.getElementById('userSchool-error').classList.remove('show');
+        }
+
+        // 학년 검사
+        const userGrade = document.getElementById('userGrade');
+        if (!userGrade.value) {
+            userGrade.classList.add('error');
+            document.getElementById('userGrade-error').classList.add('show');
+            isValid = false;
+        } else {
+            userGrade.classList.remove('error');
+            document.getElementById('userGrade-error').classList.remove('show');
+        }
+
+        // 마케팅 동의 검사
+        const marketingAgree = document.getElementById('marketingAgree');
+        if (!marketingAgree.checked) {
+            document.getElementById('marketingAgree-error').classList.add('show');
+            isValid = false;
+        } else {
+            document.getElementById('marketingAgree-error').classList.remove('show');
+        }
+
+        if (isValid) {
+            // 버튼 로딩 상태
+            const submitBtn = document.getElementById('submit-btn');
+            submitBtn.classList.add('btn-loading');
+            submitBtn.disabled = true;
+
+            const data = resultData[resultCode];
+
+            // 전송할 데이터
+            const userData = {
+                name: userName.value,
+                phone: userPhone.value,
+                school: userSchool.value,
+                grade: userGrade.value,
+                resultCode: resultCode,
+                resultTitle: data.title,
+                resultMajor: data.major
+            };
+
+            // Google Sheets로 데이터 전송
+            if (GOOGLE_SCRIPT_URL && GOOGLE_SCRIPT_URL !== 'YOUR_GOOGLE_SCRIPT_URL_HERE') {
+                fetch(GOOGLE_SCRIPT_URL, {
+                    method: 'POST',
+                    mode: 'no-cors',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(userData)
+                })
+                .then(() => {
+                    console.log('데이터 전송 완료');
+                    showResult();
+                })
+                .catch(error => {
+                    console.error('전송 오류:', error);
+                    showResult();
+                });
+            } else {
+                console.log('수집된 데이터:', userData);
+                showResult();
+            }
+        }
+    }
+
+    function showResult() {
+        document.getElementById('preview-screen').classList.remove('active');
         document.getElementById('result-screen').classList.add('active');
 
-        let result = "";
-        result += scores.E > scores.I ? "E" : "I";
-        result += scores.L > scores.M ? "L" : "M";
-        result += scores.P > scores.S ? "P" : "S";
-        result += scores.F > scores.T ? "F" : "T";
-
-        const data = resultData[result];
+        const data = resultData[resultCode];
 
         // 텍스트 매핑
-        document.getElementById('result-code').innerText = result;
+        document.getElementById('result-code').innerText = resultCode;
         document.getElementById('result-title').innerText = data.title;
         document.getElementById('result-subtitle').innerText = data.subtitle;
         document.getElementById('result-desc').innerText = data.desc;
         document.getElementById('result-major').innerText = data.major;
 
-        // [중요] 리스트 형태의 전략 데이터(strategy)를 HTML 리스트(li)로 변환
+        // 리스트 형태의 전략 데이터를 HTML 리스트로 변환
         const strategyBox = document.getElementById('result-strategy');
-        strategyBox.innerHTML = ""; // 초기화
+        strategyBox.innerHTML = "";
         data.strategy.forEach(text => {
             const li = document.createElement('li');
-            li.innerHTML = text; // <b>태그 인식을 위해 innerHTML 사용
+            li.innerHTML = text;
             strategyBox.appendChild(li);
         });
 
         // 이미지 연결
-        const imgPath = `images/${result}.png`;
+        const imgPath = `images/${resultCode}.png`;
         const imgTag = document.getElementById('result-img');
         imgTag.src = imgPath;
         imgTag.onload = function() {
             document.getElementById('img-placeholder').style.display = 'none';
         }
     }
+
+    // 실시간 입력 검사
+    document.addEventListener('DOMContentLoaded', function() {
+        const inputs = document.querySelectorAll('#user-form input, #user-form select');
+        inputs.forEach(input => {
+            input.addEventListener('input', function() {
+                this.classList.remove('error');
+                const errorEl = document.getElementById(this.id + '-error');
+                if (errorEl) errorEl.classList.remove('show');
+            });
+            input.addEventListener('change', function() {
+                this.classList.remove('error');
+                const errorEl = document.getElementById(this.id + '-error');
+                if (errorEl) errorEl.classList.remove('show');
+            });
+        });
+    });
 </script>
 
 </body>
