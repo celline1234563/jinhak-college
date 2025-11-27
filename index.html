@@ -3,17 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>대학 전공 MBTI 테스트</title>
+    <title>대학 전공 MBTI 테스트 - 심화버전</title>
     <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css" />
     <style>
-        /* [스타일 정의] 노션 스타일: 심플, 흑백, 깔끔함 */
         :root {
             --bg-color: #ffffff;
             --text-color: #37352f;
             --accent-color: #000000;
-            --gray-light: #f1f1ef;
+            --gray-light: #f7f7f5;
             --border-color: #e0e0e0;
-            --error-color: #eb5757;
+            --blue-light: #e3f2fd;
+            --blue-text: #1565c0;
         }
 
         body {
@@ -33,250 +33,94 @@
             text-align: center;
         }
 
-        /* 공통 버튼 스타일 */
+        /* 버튼 스타일 */
         .btn {
             display: block;
             width: 100%;
-            padding: 16px;
+            padding: 18px;
             margin-bottom: 12px;
             border: 1px solid var(--border-color);
-            border-radius: 8px;
+            border-radius: 12px;
             background-color: white;
             font-size: 16px;
             cursor: pointer;
             transition: 0.2s;
             color: var(--text-color);
+            line-height: 1.4;
         }
+        .btn:hover { background-color: var(--gray-light); border-color: #999; }
+        .btn-primary { background-color: var(--text-color); color: white; font-weight: 700; border: none; }
+        .btn-primary:hover { background-color: #444; color: white; }
 
-        .btn:hover {
-            background-color: var(--gray-light);
-            border-color: var(--text-color);
-        }
-
-        .btn-primary {
-            background-color: var(--text-color);
-            color: white;
-            font-weight: bold;
-        }
-        .btn-primary:hover {
-            background-color: #555;
-            color: white;
-        }
-
-        .btn:disabled {
-            background-color: #ccc;
-            color: #888;
-            cursor: not-allowed;
-            border-color: #ccc;
-        }
-        .btn:disabled:hover {
-            background-color: #ccc;
-            border-color: #ccc;
-        }
-
-        /* 화면 전환 처리 */
+        /* 화면 전환 */
         .screen { display: none; }
-        .active { display: block; }
+        .active { display: block; animation: fadeIn 0.5s ease; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-        /* 시작 화면 */
-        .title { font-size: 32px; font-weight: 800; margin-bottom: 10px; }
-        .subtitle { font-size: 16px; color: #666; margin-bottom: 40px; }
+        /* 타이포그래피 */
+        .title { font-size: 32px; font-weight: 800; margin-bottom: 10px; line-height: 1.2; }
+        .subtitle { font-size: 16px; color: #666; margin-bottom: 40px; line-height: 1.5; }
+        .question-text { font-size: 22px; font-weight: 700; margin-bottom: 40px; line-height: 1.4; word-break: keep-all; }
 
-        /* 질문 화면 */
-        .progress-bar {
-            width: 100%;
-            height: 4px;
-            background-color: var(--gray-light);
-            margin-bottom: 30px;
-            border-radius: 2px;
-        }
-        .progress-fill {
-            height: 100%;
-            background-color: var(--accent-color);
-            width: 0%;
-            transition: width 0.3s;
-        }
-        .question-text {
-            font-size: 20px;
-            font-weight: 700;
-            margin-bottom: 40px;
-            line-height: 1.5;
-            word-break: keep-all;
-        }
+        /* 진행바 */
+        .progress-bar { width: 100%; height: 6px; background-color: #eee; margin-bottom: 40px; border-radius: 10px; overflow: hidden; }
+        .progress-fill { height: 100%; background-color: var(--accent-color); width: 0%; transition: width 0.3s; }
 
-        /* 정보 입력 폼 화면 */
-        .form-title {
-            font-size: 24px;
-            font-weight: 800;
-            margin-bottom: 10px;
-        }
-        .form-subtitle {
-            font-size: 14px;
-            color: #666;
-            margin-bottom: 30px;
-        }
-
-        .form-group {
-            margin-bottom: 20px;
-            text-align: left;
-        }
-
-        .form-group label {
-            display: block;
-            font-size: 14px;
-            font-weight: 600;
-            margin-bottom: 8px;
-            color: var(--text-color);
-        }
-
-        .form-group input,
-        .form-group select {
-            width: 100%;
-            padding: 14px 16px;
-            border: 1px solid var(--border-color);
-            border-radius: 8px;
-            font-size: 16px;
-            font-family: inherit;
-            box-sizing: border-box;
-            transition: border-color 0.2s;
-        }
-
-        .form-group input:focus,
-        .form-group select:focus {
-            outline: none;
-            border-color: var(--text-color);
-        }
-
-        .form-group input.error,
-        .form-group select.error {
-            border-color: var(--error-color);
-        }
-
-        .error-message {
-            color: var(--error-color);
-            font-size: 12px;
-            margin-top: 6px;
-            display: none;
-        }
-
-        .error-message.show {
-            display: block;
-        }
-
-        /* 체크박스 스타일 */
-        .checkbox-group {
-            display: flex;
-            align-items: flex-start;
-            gap: 10px;
-            margin-bottom: 20px;
-            text-align: left;
-        }
-
-        .checkbox-group input[type="checkbox"] {
-            width: 20px;
-            height: 20px;
-            margin-top: 2px;
-            cursor: pointer;
-            accent-color: var(--text-color);
-        }
-
-        .checkbox-group label {
-            font-size: 14px;
-            line-height: 1.5;
-            cursor: pointer;
-            color: #555;
-        }
-
-        .checkbox-group label a {
-            color: var(--text-color);
-            text-decoration: underline;
-        }
-
-        .required {
-            color: var(--error-color);
-        }
-
-        /* 결과 화면 */
-        .result-code { font-size: 14px; font-weight: bold; color: #666; letter-spacing: 2px; margin-bottom: 8px; }
-        .result-title { font-size: 28px; font-weight: 800; margin-bottom: 10px; word-break: keep-all;}
-        .result-subtitle { font-size: 16px; margin-bottom: 30px; color: #555; }
+        /* 결과 페이지 스타일 (업그레이드) */
+        .result-code { font-size: 14px; font-weight: 900; color: #888; letter-spacing: 2px; margin-bottom: 8px; text-transform: uppercase; }
+        .result-title { font-size: 26px; font-weight: 800; margin-bottom: 10px; word-break: keep-all; }
+        .result-subtitle { font-size: 16px; margin-bottom: 30px; color: #555; font-weight: 500; }
 
         .result-img-box {
-            width: 100%;
-            max-width: 300px;
-            height: 300px;
+            width: 100%; max-width: 320px; height: 320px;
             margin: 0 auto 30px;
             background-color: var(--gray-light);
-            border-radius: 12px;
+            border-radius: 20px;
             overflow: hidden;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            display: flex; align-items: center; justify-content: center;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
         }
-        .result-img {
-            width: 100%;
-            height: 100%;
-            object-fit: contain;
-        }
+        .result-img { width: 100%; height: 100%; object-fit: contain; }
 
+        /* 텍스트 박스 디자인 개선 */
         .box {
             background-color: var(--gray-light);
-            padding: 20px;
-            border-radius: 8px;
+            padding: 24px;
+            border-radius: 16px;
             margin-bottom: 20px;
             text-align: left;
         }
-        .box h3 { margin-top: 0; font-size: 16px; margin-bottom: 10px; color: #888; text-transform: uppercase; font-size: 12px; font-weight: bold; }
-        .box p { margin: 0; font-size: 15px; line-height: 1.6; }
-
-        .highlight { font-weight: bold; color: #000; }
-
-        /* 블로그 링크 버튼 */
-        .btn-blog {
-            background-color: #03C75A;
-            color: white;
-            font-weight: bold;
+        .box h3 {
+            margin-top: 0;
+            margin-bottom: 12px;
+            font-size: 18px;
+            font-weight: 800;
+            color: #333;
             display: flex;
             align-items: center;
-            justify-content: center;
-            gap: 8px;
+            gap: 6px;
         }
-        .btn-blog:hover {
-            background-color: #02b351;
-            color: white;
-            border-color: #02b351;
-        }
+        .box p { margin: 0; font-size: 15px; line-height: 1.7; color: #444; white-space: pre-wrap; }
 
-        /* 제출 중 로딩 */
-        .btn-loading {
-            position: relative;
-            color: transparent !important;
-        }
-        .btn-loading::after {
-            content: "";
-            position: absolute;
-            width: 20px;
-            height: 20px;
-            top: 50%;
-            left: 50%;
-            margin-left: -10px;
-            margin-top: -10px;
-            border: 2px solid #ffffff;
-            border-top-color: transparent;
-            border-radius: 50%;
-            animation: spin 0.8s linear infinite;
-        }
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
+        /* 리스트 스타일 */
+        .box ul { margin: 0; padding-left: 20px; }
+        .box li { margin-bottom: 8px; font-size: 15px; line-height: 1.6; color: #444; }
+        .box li::marker { color: #888; }
 
-        /* 푸터 */
-        .footer {
-            margin-top: 30px;
-            padding-top: 20px;
-            border-top: 1px solid var(--border-color);
+        .highlight-box { background-color: var(--blue-light); }
+        .highlight-box h3 { color: var(--blue-text); }
+        .highlight-text { font-weight: 700; color: #000; font-size: 16px; }
+
+        .tag {
+            display: inline-block;
+            padding: 4px 8px;
+            background-color: #eee;
+            border-radius: 4px;
             font-size: 12px;
-            color: #888;
+            font-weight: bold;
+            color: #666;
+            margin-right: 4px;
+            margin-bottom: 4px;
         }
 
     </style>
@@ -285,275 +129,281 @@
 
 <div class="container">
 
-    <!-- 시작 화면 -->
     <div id="start-screen" class="screen active">
-        <h1 class="title">대학·전공<br>MBTI 테스트</h1>
-        <p class="subtitle">나의 성향으로 알아보는<br>찰떡궁합 학교와 학과는?</p>
-        <div style="font-size:50px; margin-bottom:40px;">🎓</div>
-        <button class="btn btn-primary" onclick="startTest()">테스트 시작하기</button>
+        <h1 class="title">대학 전공 & 입시<br>성향 테스트</h1>
+        <p class="subtitle">나의 성향을 분석해<br>가장 유리한 학과와 입시 전략을 알려드려요.</p>
+        <div style="font-size:60px; margin-bottom:40px;">🏛️</div>
+        <button class="btn btn-primary" onclick="startTest()">내 성향 분석하기</button>
     </div>
 
-    <!-- 질문 화면 -->
     <div id="question-screen" class="screen">
         <div class="progress-bar">
             <div class="progress-fill" id="progress"></div>
         </div>
-        <div class="question-text" id="question">질문이 여기에 나옵니다</div>
-        <button class="btn" id="btn-a" onclick="selectOption('A')">옵션 A</button>
-        <button class="btn" id="btn-b" onclick="selectOption('B')">옵션 B</button>
+        <div class="question-text" id="question">질문</div>
+        <button class="btn" id="btn-a" onclick="selectOption('A')">A</button>
+        <button class="btn" id="btn-b" onclick="selectOption('B')">B</button>
     </div>
 
-    <!-- 로딩 화면 -->
     <div id="loading-screen" class="screen">
-        <h2 style="margin-top: 50%;">분석 중... 📝</h2>
-        <p>당신에게 맞는 입시 전략을<br>데이터베이스에서 찾고 있습니다.</p>
+        <div style="margin-top: 50%;">
+            <div style="font-size:40px; margin-bottom:20px;">🔄</div>
+            <h2 style="font-size: 20px;">생활기록부 분석 중...</h2>
+            <p style="color:#888; font-size:14px;">당신의 성향에 딱 맞는<br>합격 전략을 도출하고 있습니다.</p>
+        </div>
     </div>
 
-    <!-- 정보 입력 폼 화면 -->
-    <div id="form-screen" class="screen">
-        <h2 class="form-title">거의 다 왔어요! 🎉</h2>
-        <p class="form-subtitle">결과를 확인하려면<br>아래 정보를 입력해주세요.</p>
-
-        <form id="user-form" onsubmit="submitForm(event)">
-            <div class="form-group">
-                <label for="userName">이름 <span class="required">*</span></label>
-                <input type="text" id="userName" name="userName" placeholder="이름을 입력해주세요" required>
-                <div class="error-message" id="userName-error">이름을 입력해주세요.</div>
-            </div>
-
-            <div class="form-group">
-                <label for="userPhone">핸드폰 번호 <span class="required">*</span></label>
-                <input type="tel" id="userPhone" name="userPhone" placeholder="010-0000-0000" required>
-                <div class="error-message" id="userPhone-error">올바른 핸드폰 번호를 입력해주세요.</div>
-            </div>
-
-            <div class="form-group">
-                <label for="userSchool">재학 학교 <span class="required">*</span></label>
-                <input type="text" id="userSchool" name="userSchool" placeholder="학교명을 입력해주세요" required>
-                <div class="error-message" id="userSchool-error">재학 학교를 입력해주세요.</div>
-            </div>
-
-            <div class="form-group">
-                <label for="userGrade">학년 <span class="required">*</span></label>
-                <select id="userGrade" name="userGrade" required>
-                    <option value="">학년을 선택해주세요</option>
-                    <option value="고1">고등학교 1학년</option>
-                    <option value="고2">고등학교 2학년</option>
-                    <option value="고3">고등학교 3학년</option>
-                    <option value="N수생">N수생</option>
-                    <option value="기타">기타</option>
-                </select>
-                <div class="error-message" id="userGrade-error">학년을 선택해주세요.</div>
-            </div>
-
-            <div class="checkbox-group">
-                <input type="checkbox" id="marketingAgree" name="marketingAgree" required>
-                <label for="marketingAgree">
-                    <span class="required">[필수]</span> 마케팅 정보 수신에 동의합니다.<br>
-                    <small style="color:#888;">입시 정보, 이벤트, 맞춤 콘텐츠 등을 받아보실 수 있습니다.</small>
-                </label>
-            </div>
-            <div class="error-message" id="marketingAgree-error" style="margin-top: -10px; margin-bottom: 20px;">마케팅 동의에 체크해주세요.</div>
-
-            <button type="submit" class="btn btn-primary" id="submit-btn">결과 확인하기</button>
-        </form>
-    </div>
-
-    <!-- 결과 화면 -->
     <div id="result-screen" class="screen">
         <div class="result-code" id="result-code">CODE</div>
-        <h1 class="result-title" id="result-title">타입 이름</h1>
-        <p class="result-subtitle" id="result-subtitle">한 줄 요약</p>
+        <h1 class="result-title" id="result-title">타입</h1>
+        <p class="result-subtitle" id="result-subtitle">부제</p>
 
         <div class="result-img-box">
             <img id="result-img" class="result-img" src="" alt="결과 이미지" onerror="this.style.display='none';">
-            <span id="img-placeholder" style="color:#999; font-size:14px;">(이미지 파일 필요)</span>
+            <span id="img-placeholder" style="color:#aaa; font-size:13px;">(이미지 로딩 중...)</span>
         </div>
 
         <div class="box">
-            <h3>어떤 학생이냐면</h3>
+            <h3>🧐 대학이 보는 당신은?</h3>
             <p id="result-desc">설명</p>
         </div>
 
-        <div class="box" style="background-color: #e3f2fd;">
-            <h3 style="color: #1565c0;">✨ 추천 학교 & 전공</h3>
-            <p id="result-major" class="highlight">전공</p>
+        <div class="box highlight-box">
+            <h3>🎓 최적의 학과 & 대학</h3>
+            <p id="result-major" class="highlight-text">전공</p>
+            <p style="font-size:13px; margin-top:10px; color:#5c6bc0;">* 계약학과 및 특성화학과 포함</p>
         </div>
 
         <div class="box">
-            <h3>💡 공부 전략</h3>
-            <p id="result-tip">팁</p>
+            <h3>📝 입시 & 공부 필승 전략</h3>
+            <ul id="result-strategy">
+                </ul>
         </div>
 
         <button class="btn btn-primary" onclick="location.reload()">테스트 다시하기</button>
-
-        <a href="https://blog.naver.com/jinhak-high" target="_blank" class="btn btn-blog">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
-                <path d="M16.273 12.845L7.376 0H0v24h7.727V11.155L16.624 24H24V0h-7.727v12.845z"/>
-            </svg>
-            진학하이 블로그 방문하기
-        </a>
-
-        <div class="footer">
-            더 자세한 입시 상담이 필요하시면<br>
-            진학하이에서 무료 상담을 받아보세요!
-        </div>
     </div>
 
 </div>
 
 <script>
-    // Google Apps Script 웹 앱 URL
-    const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycby-x1OUT45LRCrkmxxRBOcsMbS0w0q8kO9UlFcGtjlP6D4YrA7ksGVRQ0wlNLlMcJE/exec';
-
-    // [데이터 정의] 질문 20개
+    // [질문 데이터 20개 - 이전과 동일]
     const questions = [
         // I/E
-        { q: "시험 기간, 나에게 더 잘 맞는 공부 장소는?", a: "칸막이 쳐진 독서실 (혼자)", b: "탁 트인 카페 (사람 온기 필요)", type: "EI" },
-        { q: "조별 과제 팀원을 모아야 할 때 나는?", a: "친구가 말 걸어주길 기다린다", b: "내가 먼저 애들을 포섭한다", type: "EI" },
-        { q: "수업 중 어려운 질문을 받았다면?", a: "속으로 답을 생각한다", b: "손들고 발표하거나 짝꿍과 말한다", type: "EI" },
-        { q: "주말에 하루 종일 집에 혼자 있다면?", a: "완전 힐링, 에너지 충전!", b: "심심해서 친구에게 연락한다", type: "EI" },
+        { q: "시험 기간, 나에게 더 잘 맞는 공부 장소는?", a: "칸막이 쳐진 독서실 (혼자 집중)", b: "탁 트인 카페 (약간의 소음)", type: "EI" },
+        { q: "조별 과제 팀원을 모아야 할 때 나는?", a: "친구가 말 걸어주길 기다린다", b: "내가 먼저 필요한 애들을 모은다", type: "EI" },
+        { q: "수업 중 어려운 질문을 받았다면?", a: "속으로 답을 정리해본다", b: "손들고 발표하거나 짝꿍과 의논한다", type: "EI" },
+        { q: "주말에 하루 종일 집에 혼자 있다면?", a: "완전 힐링, 에너지 충전!", b: "입이 근질거려 친구에게 연락한다", type: "EI" },
         { q: "고민이 생겼을 때 나는?", a: "혼자 곰곰이 생각하며 정리", b: "친구들에게 털어놔야 풀림", type: "EI" },
         // M/L
-        { q: "더 흥미롭고 점수가 잘 나오는 과목은?", a: "수학, 과학 (답이 딱 떨어짐)", b: "국어, 사회 (맥락과 해석)", type: "ML" },
-        { q: "뉴스에서 'AI 기술' 기사가 나왔다.", a: "어떤 원리로 작동하지? (기술)", b: "우리 일자리를 뺏을까? (영향)", type: "ML" },
-        { q: "선호하는 수행평가 유형은?", a: "통계/그래프 분석 보고서", b: "에세이 쓰기나 말하기 발표", type: "ML" },
-        { q: "친구가 '배 아파'라고 할 때 생각은?", a: "뭘 잘못 먹었지? (원인 분석)", b: "헐 진짜? 많이 아파? (공감)", type: "ML" },
-        { q: "서점에서 발길이 가는 코너는?", a: "과학, IT, 경제(숫자)", b: "소설, 에세이, 심리", type: "ML" },
+        { q: "더 흥미롭고 점수가 잘 나오는 과목은?", a: "수학, 과학 (명확한 답)", b: "국어, 사회 (맥락과 해석)", type: "ML" },
+        { q: "뉴스에서 'AI 기술' 기사가 나왔다.", a: "어떤 알고리즘이지? (원리)", b: "사회에 어떤 영향을 미치지? (현상)", type: "ML" },
+        { q: "선호하는 수행평가 유형은?", a: "데이터 분석 및 도표 만들기", b: "에세이 쓰기나 토론/발표", type: "ML" },
+        { q: "친구가 '배 아파'라고 할 때 생각은?", a: "뭘 잘못 먹었지? 약은? (해결)", b: "헐 진짜? 많이 아파? ㅠㅠ (공감)", type: "ML" },
+        { q: "서점에서 발길이 가는 코너는?", a: "과학, 공학, 경제(숫자)", b: "소설, 인문, 심리", type: "ML" },
         // S/P
-        { q: "대학 입시 전략을 짤 때 나는?", a: "안전하게! 합격 가능한 곳 위주", b: "인생은 한 방! 상향 지원 도전", type: "SP" },
-        { q: "문제집을 풀 때 나는?", a: "1번부터 순서대로 푼다", b: "풀고 싶은 것부터 골라 푼다", type: "SP" },
-        { q: "새로운 동아리를 선택한다면?", a: "체계 잡힌 전통 있는 동아리", b: "내가 주도하는 신생 동아리", type: "SP" },
+        { q: "대학 입시 전략을 짤 때 나는?", a: "작년 입결 보고 안전하게 지원", b: "상향 지원도 섞어서 질러본다", type: "SP" },
+        { q: "문제집을 풀 때 나는?", a: "1번부터 순서대로 푼다", b: "풀고 싶은 문제부터 골라 푼다", type: "SP" },
+        { q: "동아리를 선택한다면?", a: "체계가 잡힌 전통 있는 동아리", b: "내가 주도하는 신생/자율 동아리", type: "SP" },
         { q: "여행 계획을 짤 때 나는?", a: "분 단위로 엑셀 정리", b: "대충 큰 틀만 잡고 출발", type: "SP" },
-        { q: "자유 주제 발표 시간이라면?", a: "가이드라인 예시를 찾는다", b: "평소 관심 있던 독특한 주제!", type: "SP" },
+        { q: "자유 주제 발표 시간이라면?", a: "선생님의 예시나 가이드를 따른다", b: "평소 관심 있던 독특한 주제 선정", type: "SP" },
         // T/F
-        { q: "공부할 때 더 중요한 것은?", a: "정의와 원리 이해 (Why)", b: "어디에 써먹는지 (How)", type: "TF" },
-        { q: "진로 선택의 기준은?", a: "학문적 깊이, 나의 호기심", b: "취업률, 연봉, 실용성", type: "TF" },
-        { q: "멘토링 강연, 누구를 부를까?", a: "노벨상 수상자/교수님", b: "성공한 창업가/현직자", type: "TF" },
-        { q: "물건 살 때 더 중요한 건?", a: "객관적인 스펙 데이터", b: "실제 사용 후기/리뷰", type: "TF" },
-        { q: "대학 가서 더 하고 싶은 건?", a: "도서관에서 전공 공부 A+", b: "인턴, 창업, 공모전 스펙", type: "TF" }
+        { q: "공부할 때 더 중요한 것은?", a: "이론의 정의와 원리 (Why)", b: "실제 적용 사례와 활용 (How)", type: "TF" },
+        { q: "진로 선택의 기준은?", a: "학문적 깊이, 연구 가치", b: "취업률, 연봉, 실용성", type: "TF" },
+        { q: "멘토링 강연, 누구를 부를까?", a: "노벨상 수상자/교수님", b: "성공한 창업가/실무자", type: "TF" },
+        { q: "물건 살 때 더 중요한 건?", a: "객관적인 스펙 데이터", b: "실제 사용자 리뷰와 후기", type: "TF" },
+        { q: "대학 가서 더 하고 싶은 건?", a: "도서관에서 전공 서적 파기", b: "인턴, 창업, 공모전 경험", type: "TF" }
     ];
 
-    // [데이터 정의] 결과값
+    // [결과 데이터] 심화 버전 (인재상, 공부법, 입시전략 상세화)
     const resultData = {
+        // 1. 분석가형 (I + M)
         "IMST": {
             title: "빈틈없는 논리 설계자",
-            subtitle: "감보다는 데이터, 모험보다는 확실한 정석!",
-            desc: "혼자 깊게 파고드는 걸 좋아하고, 숫자로 딱 떨어지는 결과에 안정을 느껴요. 검증된 길을 걷는 것을 선호하며, 원리를 완벽하게 이해해야 직성이 풀리는 학구파입니다.",
-            major: "서울대·고려대 통계학과, 시립대 세무학과",
-            tip: "개념서를 바이블처럼! '오답 노트'로 구멍을 메우는 완벽주의 공부법이 통합니다."
+            subtitle: "감보다는 데이터, 모험보다는 정석!",
+            desc: "대학에서는 당신을 '연구 역량이 뛰어난 학구파'로 평가합니다. 엉덩이가 무겁고 하나를 파고드는 집요함이 있어 교수님들이 가장 좋아하는 대학원 인재상이기도 하죠. 불확실한 것보다 논리적으로 딱 떨어지는 구조에서 안정을 느낍니다.",
+            major: "통계학과(서울대/고대), 세무학과(시립대), 수리과학부, 데이터사이언스",
+            strategy: [
+                "<b>📚 공부법:</b> '오답 노트'가 생명입니다. 틀린 이유를 논리적으로 분석하세요. 개념서의 목차를 보며 구조를 그리는 '마인드맵 학습'이 효과적입니다.",
+                "<b>🎯 수시 전략:</b> 화려한 활동보다 '심화 탐구'가 중요합니다. 수학/과학 교과 세특에서 어려운 개념을 증명하거나 데이터를 분석한 보고서를 어필하세요.",
+                "<b>🎯 정시 팁:</b> 멘탈 관리가 핵심. 모르는 문제가 나와도 당황하지 않고 '넘기는 연습'을 해야 수능 날 무너지지 않습니다."
+            ]
         },
         "IMSF": {
             title: "실속 챙기는 테크니션",
-            subtitle: "이론은 짧게, 실전은 길게! 기술로 승부한다.",
-            desc: "복잡한 이론보다는 당장 내 손으로 구현하고 결과가 나오는 걸 좋아해요. 기술, 코딩, 엔지니어링처럼 확실한 '기술'을 무기로 삼는 실리적인 타입입니다.",
-            major: "성균관대 반도체시스템공학, 한양대 소프트웨어학부",
-            tip: "백문이 불여일타! 강의만 듣지 말고 직접 문제를 풀거나 코드를 짜며 손으로 익히세요."
+            subtitle: "이론은 짧게, 실전은 길게! 기술 장인.",
+            desc: "추상적인 이론보다 '그래서 이게 어떻게 작동하는데?'를 중요하게 여깁니다. 대학은 당신을 '현장 실무형 엔지니어'로 봅니다. 복잡한 문제를 가장 효율적인 방법으로 해결해내는 능력이 탁월하여, 취업 시장에서 가장 선호하는 유형입니다.",
+            major: "반도체시스템(성균관대/연세대), 컴퓨터공학, 기계공학, 전자공학",
+            strategy: [
+                "<b>📚 공부법:</b> 강의만 듣기보다 직접 문제를 푸세요. 코딩이나 실험처럼 손을 움직여야 머리에 들어옵니다. 기출문제 회독 수를 늘리는 '양치기'도 잘 맞습니다.",
+                "<b>🎯 수시 전략:</b> 동아리에서 실제로 무언가를 만들어본 경험(앱 개발, 로봇 제작 등)을 강조하세요. 결과물이 명확할수록 합격률이 올라갑니다.",
+                "<b>🎯 정시 팁:</b> 탐구 과목 만점을 목표로 하세요. 수학/과학의 킬러 문항 정복이 대학 레벨을 바꿉니다."
+            ]
         },
         "IMPT": {
             title: "호기심 천국 탐구자",
             subtitle: "남들이 안 가는 길에서 답을 찾는 천재성.",
-            desc: "정해진 커리큘럼은 답답해해요. 내가 꽂힌 분야(우주, AI, 신소재 등)는 밤을 새워서라도 파고듭니다. 남들이 어려워하는 난제에 도전하는 걸 즐깁니다.",
-            major: "서울대 물리·천문학부, 이화여대 뇌인지과학부",
-            tip: "자유도가 높은 '탐구 보고서'나 '심화 학습' 위주로 생기부를 채우면 대박 날 스타일."
+            desc: "시키는 공부는 싫어하지만, 꽂히는 분야는 밤을 새워서라도 파고듭니다. 대학은 당신을 '노벨상 잠재력이 있는 괴짜 연구자'로 평가합니다. 남들이 어렵다고 피하는 물리학, 천문학 등의 난제에 도전하는 것을 즐깁니다.",
+            major: "물리·천문학부(서울대), 뇌인지과학(이화여대), 인공지능학과, 신소재공학",
+            strategy: [
+                "<b>📚 공부법:</b> '왜?'라는 질문이 해결돼야 다음으로 넘어갑니다. 유튜브나 전공 서적을 찾아보며 배경지식을 넓히는 '꼬리에 꼬리를 무는 학습'을 추천합니다.",
+                "<b>🎯 수시 전략:</b> 생기부의 '독서 활동'과 '자율 탐구'가 무기입니다. 교과서 밖의 지식을 탐구한 흔적을 남기세요. 성적 기복만 좀 잡으면 학종 깡패가 될 수 있습니다.",
+                "<b>🎯 정시 팁:</b> 좋아하는 과목만 파지 않도록 주의! 싫어하는 과목도 '최소 방어선'은 지켜야 대학을 골라 갑니다."
+            ]
         },
         "IMPF": {
             title: "방구석 혁신가",
             subtitle: "조용히 세상을 바꿀 기술을 만드는 메이커.",
-            desc: "사람 만나는 것보다 기계나 코드랑 노는 게 더 편해요. 새로운 기술, 앱, 발명품을 직접 만들어보고 창업이나 프로젝트로 실현해보고 싶은 욕구가 강합니다.",
-            major: "한양대 미래자동차공학과, 서강대 아트&테크놀로지",
-            tip: "프로젝트형 공부가 딱! 친구들과 경쟁하기보다 나만의 포트폴리오를 만드는 데 집중하세요."
+            desc: "사람 만나는 것보다 기계, 코드, 도구와 노는 게 더 편합니다. 대학은 당신을 '창의적인 기술 창업가' 재질로 봅니다. 기존의 방식에 얽매이지 않고 새로운 기술을 조합해 세상에 없던 물건을 만들어내는 능력이 있습니다.",
+            major: "미래자동차공학(한양대), 아트&테크놀로지(서강대), 로봇공학, 소프트웨어",
+            strategy: [
+                "<b>📚 공부법:</b> 게임 퀘스트 깨듯이 공부하세요. '오늘 이거 다 풀면 넷플릭스 1시간' 같은 보상 시스템이 효과적입니다. 단기 집중력이 매우 좋습니다.",
+                "<b>🎯 수시 전략:</b> 메이커톤, 해커톤, 발명 대회 등 교내외 대회 수상 실적이 중요합니다. '창의적 체험활동' 란을 꽉 채우세요.",
+                "<b>🎯 정시 팁:</b> 벼락치기에 능하지만 수능은 장기전입니다. 플래너를 쓰기보다 '매일 할 분량'만 딱 정해놓고 그것만 끝내는 식으로 가볍게 시작하세요."
+            ]
         },
+
+        // 2. 인문학자형 (I + L)
         "ILST": {
             title: "대쪽 같은 선비",
             subtitle: "한 문장을 읽어도 깊게, 본질을 꿰뚫는 힘.",
-            desc: "가볍게 떠드는 것보다 혼자 책 읽고 사색하는 시간이 소중해요. 역사, 철학, 문학처럼 인간의 본질을 탐구하거나 법/행정처럼 체계적인 학문을 선호합니다.",
-            major: "서울대 경제학부, 고려대 사학과/철학과",
-            tip: "단권화의 신! 교과서와 연계 도서를 엮어서 깊이 있게 정리하는 공부가 맞아요."
+            desc: "가볍게 떠드는 것보다 혼자 사색하는 시간이 소중합니다. 대학은 당신을 '인문학의 위기를 구할 정통 학자'로 봅니다. 역사, 철학, 법학처럼 긴 호흡으로 텍스트를 읽고 논리적으로 분석하는 학문에서 빛을 발합니다.",
+            major: "경제학부(서울대), 사학과/철학과(고려대), 행정학과, 문헌정보학과",
+            strategy: [
+                "<b>📚 공부법:</b> '단권화'의 신입니다. 교과서에 모든 내용을 필기해서 정리하세요. 텍스트를 읽고 요약하는 능력이 탁월해 국어/영어 비문학에 강합니다.",
+                "<b>🎯 수시 전략:</b> 수행평가 보고서의 퀄리티로 승부하세요. 남들은 인터넷 긁어올 때, 논문이나 원서를 인용하면 교수님 눈에 띕니다.",
+                "<b>🎯 정시 팁:</b> 국어 영역에서 고득점을 노려야 합니다. 긴 지문을 끝까지 읽어내는 집중력이 당신의 최대 무기입니다."
+            ]
         },
         "ILSF": {
             title: "다정한 서포터",
             subtitle: "세심한 배려로 사람을 치유하고 돕는 전문가.",
-            desc: "나서기보다는 뒤에서 묵묵히 챙겨주는 스타일이에요. 사람의 마음을 이해하거나 실질적인 도움을 주는 복지, 의료, 교육 분야에서 빛을 발합니다.",
-            major: "이화여대 간호학부, 중앙대 심리학과",
-            tip: "스터디 그룹에서 '설명해주기' 역할을 맡아보세요. 남을 도우며 내 공부도 완성됩니다."
+            desc: "나서기보다는 뒤에서 묵묵히 챙겨주는 외유내강형입니다. 대학은 당신을 '사회에 꼭 필요한 따뜻한 전문가'로 평가합니다. 타인의 감정을 이해하고 실질적인 도움을 주는 복지, 의료, 교육 분야가 천직입니다.",
+            major: "간호학부(이화여대), 심리학과(중앙대), 사회복지학과, 교대/초등교육",
+            strategy: [
+                "<b>📚 공부법:</b> 친구에게 설명해주는 '선생님 놀이'가 최고입니다. 남을 도와줄 때 내 머릿속에도 정리가 잘 됩니다. 스터디 그룹에서 멘토 역할을 하세요.",
+                "<b>🎯 수시 전략:</b> 봉사활동 시간과 내용이 진정성 있어야 합니다. 멘토링, 또래 상담 등 '타인을 위한 활동'을 꾸준히 지속한 기록을 남기세요.",
+                "<b>🎯 정시 팁:</b> 경쟁에 스트레스 받지 마세요. '남을 이기자'가 아니라 '어제의 나보다 잘하자'는 마인드로 페이스를 유지하세요."
+            ]
         },
         "ILPT": {
             title: "날카로운 비평가",
             subtitle: "세상의 이면을 읽어내는 통찰력.",
-            desc: "당연한 것에 '왜?'라는 질문을 던집니다. 사회 문제, 정책, 국제 정세 등을 분석하고 비판적인 시각으로 글을 쓰거나 토론하는 능력이 탁월합니다.",
-            major: "한국외대 LD/LT학부, 연세대 정치외교학과",
-            tip: "뉴스, 칼럼 등을 스크랩하며 나만의 관점을 정리하는 '논술형 공부'가 강점입니다."
+            desc: "당연한 것에 '왜?'라는 질문을 던집니다. 대학은 당신을 '사회를 분석하고 대안을 제시할 지식인'으로 봅니다. 정치, 외교, 사회 문제에 대해 비판적인 시각으로 글을 쓰고 토론하는 능력이 탁월합니다.",
+            major: "LD/LT학부(한국외대), 정치외교학과(연세대), 사회학과, 정책학과",
+            strategy: [
+                "<b>📚 공부법:</b> 무작정 암기는 질색입니다. 흐름과 인과관계를 이해해야 합니다. 뉴스나 사설을 읽으며 비판적 사고력을 키우는 것이 국어/사탐 점수로 이어집니다.",
+                "<b>🎯 수시 전략:</b> 교내 토론 대회, 소논문 활동이 핵심입니다. 사회 이슈에 대해 남들과 다른 독창적인 관점을 제시하는 세특을 만드세요.",
+                "<b>🎯 정시 팁:</b> 사탐(사회탐구) 과목에서 만점을 노리세요. 도표 분석이나 철학적 지문이 나오는 과목이 유리합니다."
+            ]
         },
         "ILPF": {
             title: "감성 타고난 작가",
             subtitle: "나만의 세계관을 글과 예술로 표현하는 창작자.",
-            desc: "상상력이 풍부하고 감수성이 예민해요. 정해진 틀보다는 자유로운 분위기에서 글을 쓰거나 콘텐츠를 기획할 때 에너지가 폭발합니다.",
-            major: "연세대 언론홍보영상학부, 중앙대 문예창작과",
-            tip: "딱딱한 암기보다는 '스토리텔링'으로 외우세요. 역사를 드라마처럼 이해하면 만점!"
+            desc: "상상력이 풍부하고 감수성이 예민합니다. 대학은 당신을 'K-콘텐츠를 이끌어갈 크리에이티브 인재'로 봅니다. 정해진 틀보다는 자유로운 분위기에서 글을 쓰거나 기획할 때 에너지가 폭발합니다.",
+            major: "언론홍보영상(연세대), 문예창작과(중앙대), 미디어커뮤니케이션, 문화콘텐츠",
+            strategy: [
+                "<b>📚 공부법:</b> 딱딱한 암기보다 '스토리텔링'으로 외우세요. 역사를 드라마처럼, 과학을 SF 영화처럼 상상하며 공부하면 기억에 오래 남습니다.",
+                "<b>🎯 수시 전략:</b> UCC 제작, 문집 발간, 블로그 운영 등 '결과물'이 있는 활동이 좋습니다. 내신이 조금 부족해도 포트폴리오로 뒤집을 수 있습니다.",
+                "<b>🎯 정시 팁:</b> 기분파 기질을 조심하세요. 감정이 우울하면 공부를 놓아버릴 수 있습니다. 규칙적인 생활 리듬을 유지하는 게 관건입니다."
+            ]
         },
+
+        // 3. 리더형 (E + M)
         "EMST": {
             title: "현실적인 전략가",
             subtitle: "최소 시간 최대 효율, 스마트한 승부사.",
-            desc: "감정적인 호소보다는 정확한 수치와 근거를 믿습니다. 조직 내에서 체계를 잡고, 자원을 관리하고, 돈의 흐름을 읽는 능력이 뛰어납니다.",
-            major: "고려대 경영대학, 연세대 응용통계학과",
-            tip: "타이머를 활용하세요! 제한 시간 안에 문제를 풀어내는 타임 어택 연습이 효과적입니다."
+            desc: "감정 호소보다는 정확한 수치와 근거를 믿습니다. 대학은 당신을 '조직을 효율적으로 이끌 차세대 CEO'로 봅니다. 자원을 관리하고, 돈의 흐름을 읽고, 목표를 달성해내는 경영/경제 분야에 최적화되어 있습니다.",
+            major: "경영대학(고려대), 응용통계학과(연세대), 금융공학, 회계학과",
+            strategy: [
+                "<b>📚 공부법:</b> 타이머를 활용한 '타임 어택' 공부법이 좋습니다. 제한 시간 안에 문제를 풀어내는 연습을 하세요. 효율을 중시해 기출 분석을 누구보다 잘합니다.",
+                "<b>🎯 수시 전략:</b> 학생회장, 동아리 부장 등 리더십 경험은 필수. 단순히 '했다'가 아니라 '어떤 문제를 어떻게 해결해서 성과를 냈는지' 수치로 증명하세요.",
+                "<b>🎯 정시 팁:</b> 모의고사 점수 분석을 통해 '버릴 문제'와 '맞출 문제'를 전략적으로 구분하세요. 정시 지원 전략도 기가 막히게 잘 짭니다."
+            ]
         },
         "EMSF": {
             title: "유능한 해결사",
             subtitle: "문제가 생기면 답을 찾아내는 현장 지휘관.",
-            desc: "책상 앞 공부보다 현장에서 부딪히며 배우는 걸 선호합니다. 공학적 지식과 리더십을 겸비해 프로젝트를 성공으로 이끄는 리더 타입입니다.",
-            major: "서울대 산업공학과, 한양대 정보시스템학과",
-            tip: "플래너 활용의 달인. 주간 계획을 세우고 하나씩 지워나가는 성취감을 즐기세요."
+            desc: "책상 앞 공부보다 현장에서 부딪히며 배우는 걸 선호합니다. 대학은 당신을 '산업 현장의 핵심 리더'로 봅니다. 공학적 지식과 사람을 이끄는 리더십을 동시에 갖춘, 대기업이 탐내는 인재입니다.",
+            major: "산업공학과(서울대), 정보시스템(한양대), 건축공학, 도시공학",
+            strategy: [
+                "<b>📚 공부법:</b> 플래너 활용의 달인입니다. 주간 계획을 세우고 하나씩 지워나가는 성취감을 즐기세요. 스터디 그룹을 직접 조직해서 이끄는 것도 좋습니다.",
+                "<b>🎯 수시 전략:</b> 팀 프로젝트에서 조장 역할을 도맡으세요. 팀원 간의 갈등을 중재하고 프로젝트를 성공으로 이끈 경험이 자소서/면접의 필승 카드입니다.",
+                "<b>🎯 정시 팁:</b> 실수를 용납하지 않는 꼼꼼함이 있습니다. 하지만 수능 당일 긴장감을 조절하는 '마인드 컨트롤' 훈련이 필요합니다."
+            ]
         },
         "EMPT": {
             title: "야망 있는 개척자",
-            subtitle: "큰 그림을 그리고 판을 짜는 미래의 CEO.",
-            desc: "안정적인 직장보다는 내 사업이나 큰 프로젝트를 꿈꿉니다. 데이터와 트렌드를 읽어 과감하게 투자하거나 새로운 시장을 개척하는 배짱이 있습니다.",
-            major: "성균관대 글로벌경영학과, 고려대 경영학과",
-            tip: "경쟁이 약입니다. 라이벌을 설정하거나 모의고사 등수를 목표로 삼으면 불타오릅니다."
+            subtitle: "큰 그림을 그리고 판을 짜는 미래의 창업가.",
+            desc: "안정적인 직장보다는 내 사업이나 큰 프로젝트를 꿈꿉니다. 대학은 당신을 '도전적인 글로벌 인재'로 평가합니다. 데이터와 트렌드를 읽어 과감하게 배팅하고 새로운 시장을 개척하는 배짱이 있습니다.",
+            major: "글로벌경영(성균관대), 경영학과(고려대), 무역학과, 벤처경영",
+            strategy: [
+                "<b>📚 공부법:</b> 경쟁이 약입니다. 라이벌을 설정하거나, 전교 등수를 목표로 삼으면 불타오릅니다. 지루한 반복 학습보다는 심화 문제 도전을 즐깁니다.",
+                "<b>🎯 수시 전략:</b> 창업 동아리, 경제 경시대회 등 도전적인 스펙을 쌓으세요. 교내 활동의 스케일을 키워서 남들이 안 해본 기획을 해보는 게 좋습니다.",
+                "<b>🎯 정시 팁:</b> '한 방'을 노리는 성향이 있어 상향 지원을 선호합니다. 재수 불사를 각오하고 소신 지원하는 경우가 많으니 플랜 B를 꼭 준비하세요."
+            ]
         },
         "EMPF": {
             title: "슈퍼 제너럴리스트",
             subtitle: "이과 머리와 문과 감성을 다 가진 융합형 인재.",
-            desc: "호기심이 많아 이것저것 다 잘합니다. 기술도 알지만 사람도 잘 다뤄서, 개발자와 디자이너 사이를 조율하거나 기술 창업을 하기에 최적화되어 있습니다.",
-            major: "연세대 언더우드국제대학(UIC), 서강대 아트&테크놀로지",
-            tip: "여러 과목을 짧게 끊어서 공부하세요. 지루할 틈을 주지 않는 '순환 학습' 추천!"
+            desc: "호기심이 많아 이것저것 다 잘합니다. 대학은 당신을 '4차 산업혁명 시대의 융합 인재'로 봅니다. 기술도 알지만 사람도 잘 다뤄서, 개발자와 디자이너 사이를 조율하거나 기술 창업을 하기에 최적화되어 있습니다.",
+            major: "자유전공학부(서울대), 아트&테크놀로지(서강대), 정보시스템, 문화기술",
+            strategy: [
+                "<b>📚 공부법:</b> 한 과목만 오래 하면 지겨워합니다. 여러 과목을 30분~1시간 단위로 번갈아 하는 '인터리빙 학습'이 효과적입니다.",
+                "<b>🎯 수시 전략:</b> 문/이과를 넘나드는 활동을 보여주세요. 과학 동아리에서 인문학 책을 읽고 토론하거나, 문학 시간에 데이터 분석을 하는 식의 '융합'이 키포인트.",
+                "<b>🎯 정시 팁:</b> 국영수탐 골고루 잘하는 올라운더입니다. 특정 과목 망치지 않게 밸런스 유지만 잘하면 정시로도 승산이 큽니다."
+            ]
         },
+
+        // 4. 활동가형 (E + L)
         "ELST": {
             title: "모범적인 리더",
-            subtitle: "규칙과 원칙을 지키며 모두를 이끄는 반장 스타일.",
-            desc: "책임감이 강하고 공적인 가치를 중요하게 생각합니다. 법, 규범, 교육 시스템 안에서 사람들을 올바른 방향으로 이끄는 역할이 잘 어울립니다.",
-            major: "고려대 교육학과, 시립대 도시행정학과",
-            tip: "가르치면서 공부하기! 친구들에게 선생님처럼 설명해주면 내가 제일 공부가 잘됩니다."
+            subtitle: "규칙과 원칙을 지키며 모두를 이끄는 반장.",
+            desc: "책임감이 강하고 공적인 가치를 중요하게 생각합니다. 대학은 당신을 '사회 정의를 실현할 법조인/공직자' 재목으로 봅니다. 법, 규범, 교육 시스템 안에서 사람들을 올바른 방향으로 이끄는 리더십이 있습니다.",
+            major: "교육학과(고려대), 도시행정(시립대), 로스쿨 트랙(법학), 사회교육과",
+            strategy: [
+                "<b>📚 공부법:</b> '정석'대로 공부하는 스타일. 학교 수업과 교과서 위주로 성실하게 공부합니다. 가르치면서 공부하면(메타인지) 성적이 쑥쑥 오릅니다.",
+                "<b>🎯 수시 전략:</b> 전교 회장, 학급 반장 등 임원 경력이 필수입니다. 성실한 내신 관리와 모범적인 세특 기록으로 교과전형/학종 모두 유리합니다.",
+                "<b>🎯 정시 팁:</b> 꾸준함이 무기입니다. 매일 정해진 루틴대로 공부하면 수능 날에도 평소 실력을 100% 발휘할 수 있습니다."
+            ]
         },
         "ELSF": {
             title: "분위기 메이커",
-            subtitle: "사람이 재산! 어디서나 환영받는 인싸력.",
-            desc: "사람들과 어울리며 에너지를 얻습니다. 서비스 마인드가 투철하고, 트렌드에 민감해 대중이 뭘 좋아하는지 본능적으로 캐치합니다.",
-            major: "경희대 호텔경영학과, 중앙대 광고홍보학과",
-            tip: "혼자 독서실 절대 금지. 스터디 그룹이나 개방형 도서관에서 '함께' 공부해야 능률 업!"
+            subtitle: "사람이 재산! 어디서나 환영받는 인싸.",
+            desc: "사람들과 어울리며 에너지를 얻습니다. 대학은 당신을 '소통 능력이 뛰어난 커뮤니케이션 전문가'로 봅니다. 서비스 마인드가 투철하고 트렌드에 민감해, 광고/홍보나 호텔/관광 분야에서 두각을 나타냅니다.",
+            major: "호텔경영(경희대), 광고홍보(중앙대), 소비자학과, 항공서비스",
+            strategy: [
+                "<b>📚 공부법:</b> 혼자 독서실 가면 잡니다. 개방형 도서관이나 친구들과 함께하는 '열품타(공부앱)' 캠 스터디 등을 활용하세요. 함께 으쌰으쌰 해야 합니다.",
+                "<b>🎯 수시 전략:</b> 면접 전형이 있는 대학을 노리세요. 글보다는 말로 표현하는 능력이 뛰어나서, 면접관을 사로잡을 수 있는 매력이 있습니다.",
+                "<b>🎯 정시 팁:</b> 친구 따라 강남 가지 마세요. 친구들이랑 놀고 싶은 유혹만 이겨내면 성적은 금방 오릅니다. 공부할 땐 폰을 끄세요!"
+            ]
         },
         "ELPT": {
             title: "글로벌 외교관",
             subtitle: "무대는 세계로! 언변과 논리로 설득하는 협상가.",
-            desc: "국내에만 머물기엔 그릇이 큽니다. 외국어에 능통하거나 국제 정세, 이슈에 관심이 많아 세계를 누비며 활약하는 꿈을 꿉니다.",
-            major: "한국외대 LD/LT학부, 연세대 국제학부(HASS)",
-            tip: "영어 원서 읽기나 미드 쉐도잉 등 언어와 공부를 결합하면 시너지가 납니다."
+            desc: "국내에만 머물기엔 그릇이 큽니다. 대학은 당신을 '국제 무대에서 활약할 글로벌 리더'로 봅니다. 외국어 감각이 뛰어나고 국제 정세에 밝아, 외교관이나 글로벌 기업의 마케터로 성장할 가능성이 큽니다.",
+            major: "LD/LT학부(한국외대), 국제학부(연세대 UIC), 정치외교, 어문계열",
+            strategy: [
+                "<b>📚 공부법:</b> 언어 감각이 좋습니다. 영어 원서 읽기, 미드 쉐도잉 등 재미있는 방식으로 공부하세요. 토론식 수업이나 학원이 잘 맞습니다.",
+                "<b>🎯 수시 전략:</b> 영어/제2외국어 성적은 기본. 모의 유엔(MUN), 국제 교류 동아리 활동을 통해 글로벌 역량을 증명하세요.",
+                "<b>🎯 정시 팁:</b> 절대평가인 영어는 무조건 1등급 깔고 가야 합니다. 국어/사탐 위주로 전략을 짜면 상위권 대학 진입이 가능합니다."
+            ]
         },
         "ELPF": {
             title: "트렌드 세터",
-            subtitle: "지루한 건 딱 질색, 세상의 중심에서 나를 외치다.",
-            desc: "끼가 넘치고 표현력이 좋습니다. 영상, 미디어, 방송 등 내가 주인공이 되거나 내 창작물을 대중에게 보여주는 일에서 희열을 느낍니다.",
-            major: "연세대 언론홍보영상학부, 이화여대 스크랜튼학부",
-            tip: "유튜브나 인스타로 배운 내용을 요약해서 올리는 등 '아웃풋' 위주의 공부가 재밌을 거예요."
+            subtitle: "지루한 건 질색, 세상의 중심에서 나를 외치다.",
+            desc: "끼가 넘치고 표현력이 좋습니다. 대학은 당신을 '미디어를 장악할 차세대 콘텐츠 기획자'로 봅니다. 영상, 방송, 패션 등 내가 주인공이 되거나 창작물을 대중에게 보여주는 일에서 희열을 느낍니다.",
+            major: "언론홍보영상(연세대), 스크랜튼학부(이화여대), 연극영화, 의류환경",
+            strategy: [
+                "<b>📚 공부법:</b> 텍스트만 보면 좁니다. 유튜브 강의, 인강 등 시청각 자료를 적극 활용하세요. 내가 배운 걸 영상이나 카드뉴스로 요약해보는 것도 좋습니다.",
+                "<b>🎯 수시 전략:</b> 성적보다는 '활동'입니다. 방송반, 연극부, 홍보부 등에서 기획하고 결과물을 낸 포트폴리오를 만드세요. 예체능 실기 전형도 고려해볼 만합니다.",
+                "<b>🎯 정시 팁:</b> '선택과 집중'이 필요합니다. 전 과목 다 잘하려고 하기보다, 반영 비율이 높은 과목에 올인하는 전략이 통할 수 있습니다."
+            ]
         }
     };
 
-    // [로직] 변수 설정
+    // [로직] 변수 및 함수 (이전과 동일, 렌더링 부분만 수정됨)
     let currentQuestion = 0;
     let scores = { I:0, E:0, M:0, L:0, S:0, P:0, T:0, F:0 };
-    let resultCode = "";
 
     function startTest() {
         document.getElementById('start-screen').classList.remove('active');
@@ -566,8 +416,6 @@
         document.getElementById('question').innerText = `Q${currentQuestion+1}. ${q.q}`;
         document.getElementById('btn-a').innerText = q.a;
         document.getElementById('btn-b').innerText = q.b;
-
-        // 진행바 업데이트
         const progressPercent = ((currentQuestion) / questions.length) * 100;
         document.getElementById('progress').style.width = `${progressPercent}%`;
     }
@@ -575,8 +423,6 @@
     function selectOption(choice) {
         const q = questions[currentQuestion];
         const type = q.type;
-
-        // 점수 매핑
         if (choice === 'B') {
             if(type === 'EI') scores.E++;
             if(type === 'ML') scores.L++;
@@ -588,7 +434,6 @@
             if(type === 'SP') scores.S++;
             if(type === 'TF') scores.T++;
         }
-
         currentQuestion++;
         if (currentQuestion < questions.length) {
             showQuestion();
@@ -600,178 +445,47 @@
     function showLoading() {
         document.getElementById('question-screen').classList.remove('active');
         document.getElementById('loading-screen').classList.add('active');
-
-        // 결과 코드 미리 계산
-        resultCode = "";
-        resultCode += scores.E > scores.I ? "E" : "I";
-        resultCode += scores.L > scores.M ? "L" : "M";
-        resultCode += scores.P > scores.S ? "P" : "S";
-        resultCode += scores.F > scores.T ? "F" : "T";
-
         setTimeout(() => {
-            showForm();
-        }, 1500);
-    }
-
-    function showForm() {
-        document.getElementById('loading-screen').classList.remove('active');
-        document.getElementById('form-screen').classList.add('active');
-    }
-
-    // 폼 유효성 검사 및 제출
-    function submitForm(event) {
-        event.preventDefault();
-
-        let isValid = true;
-
-        // 이름 검사
-        const userName = document.getElementById('userName');
-        if (!userName.value.trim()) {
-            userName.classList.add('error');
-            document.getElementById('userName-error').classList.add('show');
-            isValid = false;
-        } else {
-            userName.classList.remove('error');
-            document.getElementById('userName-error').classList.remove('show');
-        }
-
-        // 핸드폰 번호 검사
-        const userPhone = document.getElementById('userPhone');
-        const phoneRegex = /^01[0-9]-?[0-9]{3,4}-?[0-9]{4}$/;
-        if (!userPhone.value.trim() || !phoneRegex.test(userPhone.value.replace(/-/g, '').replace(/^01/, '01'))) {
-            // 좀 더 유연한 검사
-            const cleanPhone = userPhone.value.replace(/-/g, '');
-            if (!/^01[0-9]{8,9}$/.test(cleanPhone)) {
-                userPhone.classList.add('error');
-                document.getElementById('userPhone-error').classList.add('show');
-                isValid = false;
-            } else {
-                userPhone.classList.remove('error');
-                document.getElementById('userPhone-error').classList.remove('show');
-            }
-        } else {
-            userPhone.classList.remove('error');
-            document.getElementById('userPhone-error').classList.remove('show');
-        }
-
-        // 재학 학교 검사
-        const userSchool = document.getElementById('userSchool');
-        if (!userSchool.value.trim()) {
-            userSchool.classList.add('error');
-            document.getElementById('userSchool-error').classList.add('show');
-            isValid = false;
-        } else {
-            userSchool.classList.remove('error');
-            document.getElementById('userSchool-error').classList.remove('show');
-        }
-
-        // 학년 검사
-        const userGrade = document.getElementById('userGrade');
-        if (!userGrade.value) {
-            userGrade.classList.add('error');
-            document.getElementById('userGrade-error').classList.add('show');
-            isValid = false;
-        } else {
-            userGrade.classList.remove('error');
-            document.getElementById('userGrade-error').classList.remove('show');
-        }
-
-        // 마케팅 동의 검사
-        const marketingAgree = document.getElementById('marketingAgree');
-        if (!marketingAgree.checked) {
-            document.getElementById('marketingAgree-error').classList.add('show');
-            isValid = false;
-        } else {
-            document.getElementById('marketingAgree-error').classList.remove('show');
-        }
-
-        if (isValid) {
-            // 버튼 로딩 상태
-            const submitBtn = document.getElementById('submit-btn');
-            submitBtn.classList.add('btn-loading');
-            submitBtn.disabled = true;
-
-            const data = resultData[resultCode];
-
-            // 전송할 데이터
-            const userData = {
-                name: userName.value,
-                phone: userPhone.value,
-                school: userSchool.value,
-                grade: userGrade.value,
-                resultCode: resultCode,
-                resultTitle: data.title,
-                resultMajor: data.major
-            };
-
-            // Google Sheets로 데이터 전송
-            if (GOOGLE_SCRIPT_URL !== 'YOUR_GOOGLE_SCRIPT_URL_HERE') {
-                fetch(GOOGLE_SCRIPT_URL, {
-                    method: 'POST',
-                    mode: 'no-cors',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify(userData)
-                })
-                .then(() => {
-                    console.log('데이터 전송 완료');
-                    showResult();
-                })
-                .catch(error => {
-                    console.error('전송 오류:', error);
-                    // 오류가 나도 결과는 보여줌
-                    showResult();
-                });
-            } else {
-                // URL이 설정되지 않은 경우 콘솔에만 출력
-                console.log('⚠️ Google Script URL이 설정되지 않았습니다.');
-                console.log('수집된 데이터:', userData);
-                showResult();
-            }
-        }
+            showResult();
+        }, 1800);
     }
 
     function showResult() {
-        document.getElementById('form-screen').classList.remove('active');
+        document.getElementById('loading-screen').classList.remove('active');
         document.getElementById('result-screen').classList.add('active');
 
-        const data = resultData[resultCode];
+        let result = "";
+        result += scores.E > scores.I ? "E" : "I";
+        result += scores.L > scores.M ? "L" : "M";
+        result += scores.P > scores.S ? "P" : "S";
+        result += scores.F > scores.T ? "F" : "T";
 
-        // 화면에 뿌리기
-        document.getElementById('result-code').innerText = resultCode;
+        const data = resultData[result];
+
+        // 텍스트 매핑
+        document.getElementById('result-code').innerText = result;
         document.getElementById('result-title').innerText = data.title;
         document.getElementById('result-subtitle').innerText = data.subtitle;
         document.getElementById('result-desc').innerText = data.desc;
         document.getElementById('result-major').innerText = data.major;
-        document.getElementById('result-tip').innerText = data.tip;
+
+        // [중요] 리스트 형태의 전략 데이터(strategy)를 HTML 리스트(li)로 변환
+        const strategyBox = document.getElementById('result-strategy');
+        strategyBox.innerHTML = ""; // 초기화
+        data.strategy.forEach(text => {
+            const li = document.createElement('li');
+            li.innerHTML = text; // <b>태그 인식을 위해 innerHTML 사용
+            strategyBox.appendChild(li);
+        });
 
         // 이미지 연결
-        const imgPath = `images/${resultCode}.png`;
+        const imgPath = `images/${result}.png`;
         const imgTag = document.getElementById('result-img');
         imgTag.src = imgPath;
-
         imgTag.onload = function() {
             document.getElementById('img-placeholder').style.display = 'none';
         }
     }
-
-    // 실시간 입력 검사 (에러 스타일 제거)
-    document.addEventListener('DOMContentLoaded', function() {
-        const inputs = document.querySelectorAll('#user-form input, #user-form select');
-        inputs.forEach(input => {
-            input.addEventListener('input', function() {
-                this.classList.remove('error');
-                const errorEl = document.getElementById(this.id + '-error');
-                if (errorEl) errorEl.classList.remove('show');
-            });
-            input.addEventListener('change', function() {
-                this.classList.remove('error');
-                const errorEl = document.getElementById(this.id + '-error');
-                if (errorEl) errorEl.classList.remove('show');
-            });
-        });
-    });
 </script>
 
 </body>
