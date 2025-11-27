@@ -293,7 +293,7 @@
     <div id="loading-screen" class="screen">
         <div style="margin-top: 50%;">
             <div style="font-size:40px; margin-bottom:20px;">🔄</div>
-            <h2 style="font-size: 20px;">생활기록부 분석 중...</h2>
+            <h2 style="font-size: 20px;">나의 성향과 전공적합도 분석중...</h2>
             <p style="color:#888; font-size:14px;">당신의 성향에 딱 맞는<br>합격 전략을 도출하고 있습니다.</p>
         </div>
     </div>
@@ -705,7 +705,7 @@
         document.getElementById('preview-subtitle').innerText = data.subtitle;
 
         // 이미지 연결
-        const imgPath = `images/${resultCode}.png`;
+        const imgPath = `images/${resultCode}.jpg`;
         const imgTag = document.getElementById('preview-img');
         imgTag.src = imgPath;
         imgTag.onload = function() {
@@ -840,7 +840,7 @@
         });
 
         // 이미지 연결
-        const imgPath = `images/${resultCode}.png`;
+        const imgPath = `images/${resultCode}.jpg`;
         const imgTag = document.getElementById('result-img');
         imgTag.src = imgPath;
         imgTag.onload = function() {
